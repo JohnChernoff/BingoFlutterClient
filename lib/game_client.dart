@@ -42,6 +42,14 @@ class GameClient extends ZugClient {
   }
 
   @override
+  bool handleUpdateArea(data) {
+    super.handleUpdateArea(data);
+    Area area = getOrCreateArea(data);
+    if (area is Game) area.update(data, this);
+    return true;
+  }
+
+  @override
   Area createArea(data) {
     return Game(data);
   }

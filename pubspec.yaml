@@ -35,6 +35,10 @@ dependencies:
     git: "https://github.com/JohnChernoff/zugclient"
   zug_utils:
     git: "https://github.com/JohnChernoff/zug_utils"
+  zug_chess:
+    git: "https://github.com/JohnChernoff/zug_chess"
+  flutter_chess_board:
+    git: "https://github.com/JohnChernoff/flutter_chess_board"
 
   logging: ^1.2.0
   universal_html: ^2.2.4

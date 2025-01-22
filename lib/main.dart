@@ -12,9 +12,9 @@ void main() {
   String appName = "GameApp";
   ZugUtils.getIniDefaults("defaults.ini").then((defaults) {
     ZugUtils.getPrefs().then((prefs) {
-      String domain = defaults["domain"] ?? "mygame.com";
-      int port = int.parse(defaults["port"] ?? "1234");
-      String endPoint = defaults["endpoint"] ?? "mygame";
+      String domain = defaults["domain"] ?? "bingochess.com";
+      int port = int.parse(defaults["port"] ?? "5678");
+      String endPoint = defaults["endpoint"] ?? "bingosrv";
       bool localServer = bool.parse(defaults["localServer"] ?? "true");
       log("Starting $appName Client, domain: $domain, port: $port, endpoint: $endPoint, localServer: $localServer");
       GameClient client = GameClient(domain,port,endPoint,prefs,localServer : localServer);
@@ -25,7 +25,7 @@ void main() {
 
 class GameApp extends ZugApp {
   GameApp(super.client, super.appName,
-      {super.key, super.logLevel = Level.INFO, super.noNav = true});
+      {super.key, super.logLevel = Level.INFO, super.noNav = false});
 
   @override
   AppBar createAppBar(BuildContext context, ZugClient client,
