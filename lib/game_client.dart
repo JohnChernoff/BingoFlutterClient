@@ -7,9 +7,8 @@ class GameClient extends ZugClient {
 
   Game get currentGame => currentArea as Game;
 
-  GameClient(super.domain, super.port, super.remoteEndpoint, super.prefs, {super.localServer}) {
-    showServMess = true;
-    clientName = "my_client";
+  GameClient(super.domain, super.port, super.remoteEndpoint, super.prefs, {super.localServer}) { //showServMess = true;
+    clientName = "BingoClient";
     addFunctions({
       GameMsg.gameWin: handleVictory,
       GameMsg.gameLose: handleDefeat,

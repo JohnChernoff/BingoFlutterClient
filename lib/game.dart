@@ -1,4 +1,3 @@
-import 'package:zugclient/zug_app.dart';
 import 'package:zugclient/zug_client.dart';
 import 'package:zugclient/zug_fields.dart';
 import 'game_client.dart';
@@ -10,15 +9,16 @@ class BingoBoard {
   BingoBoard(this.playerName,this.squares,this.dim);
 }
 
-
 class BingoSquare {
-  final bool checked;
+  final int checked;
   final String chessSqr;
   BingoSquare(this.chessSqr,this.checked);
 }
 
 class Game extends Area {
   static String? fen;
+  String? phase;
+  int? ante,pot;
   List<BingoBoard> boards = [];
   Game(super.data);
 
@@ -34,9 +34,21 @@ class Game extends Area {
           square["checked"],
         ));
       }
-      boards.add(BingoBoard(UniqueName.fromData(boardData), sqrList,data["dim"]));
-      fen = data["fen"]; //+ " w KQkq - 0 1";
+      boards.add(BingoBoard(UniqueName.fromData(boardData[fieldUser]), sqrList,data["dim"]));
+      fen = data["fen"];
+      phase = data["phase"];
+      ante = data["ante"];
+      pot = data["pot"];
     }
+  }
+
+  BingoBoard? getBoardByUser(UniqueName? name) {
+    if (boards.isEmpty) return null;
+    return boards.where((board) => board.playerName.eq(name)).firstOrNull;
+  }
+
+  List<BingoBoard> getOtherBoards(UniqueName? name) {
+    return boards.where((board) => !board.playerName.eq(name)).toList();
   }
 
 }

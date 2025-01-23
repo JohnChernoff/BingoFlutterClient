@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:zug_utils/zug_utils.dart';
+import 'package:zugclient/lobby_page.dart';
 import 'package:zugclient/zug_app.dart';
 import 'package:zugclient/zug_client.dart';
 import 'game_client.dart';
@@ -25,7 +26,7 @@ void main() {
 
 class GameApp extends ZugApp {
   GameApp(super.client, super.appName,
-      {super.key, super.logLevel = Level.INFO, super.noNav = false});
+      {super.key, super.logLevel = Level.INFO, super.noNav = true});
 
   @override
   AppBar createAppBar(BuildContext context, ZugClient client,
@@ -42,4 +43,5 @@ class GameApp extends ZugApp {
   Widget createMainPage(client) {
     return GamePage(client);
   }
+
 }
