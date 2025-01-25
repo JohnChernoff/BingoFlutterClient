@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chess_board/flutter_chess_board.dart';
+import 'package:flutter_chess_board/flutter_chess_board.dart' hide Color;
 import 'package:zugclient/lobby_page.dart';
 import 'package:zugclient/zug_chat.dart';
 import 'package:zugclient/zug_fields.dart';
-import 'package:zugclient_template/game_client.dart';
 import 'game.dart';
+import 'game_client.dart';
+import 'main.dart';
 
 class GamePage extends StatefulWidget {
   static TextStyle textStyle = const TextStyle(color: Colors.white);
@@ -26,8 +27,7 @@ class _MainPageState extends State<GamePage> {
 
   @override
   Widget build(BuildContext context) {
-    List<BingoBoard> boards = widget.client.currentGame.boards;
-    //if (boards.isEmpty) return LobbyPage(widget.client, style: LobbyStyle.tersePort, width: 320);
+    //List<BingoBoard> boards = widget.client.currentGame.boards;  //if (boards.isEmpty) return LobbyPage(widget.client, style: LobbyStyle.tersePort, width: 320);
     BingoBoard? userBoard = widget.client.currentGame.getBoardByUser(widget.client.userName);
     List<BingoBoard> otherBoards = widget.client.currentGame.getOtherBoards(widget.client.userName);
     chessBoardController.loadFen(Game.fen ?? "");
@@ -39,36 +39,58 @@ class _MainPageState extends State<GamePage> {
   }
 
   Widget getLandscapeLayout(BingoBoard? userBoard,List<BingoBoard> otherBoards,BoxConstraints constraints) {
+    TextStyle txtStyle = const TextStyle(color: Colors.white);
+    bool isRunning = widget.client.currentGame.phase == "running";
+    Color borderColor = isRunning ? Colors.white : Colors.brown;
+    bool isActiveGame = isRunning && widget.client.currentGame.containsOccupant(widget.client.userName);
     double boardSize = constraints.maxWidth / 4;
-    return Column(
-      children: [
-        Text(widget.client.currentGame.title),
-        Text(widget.client.currentGame.phase ?? ""),
-        Expanded(child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            userBoard == null ?
-            const SizedBox.shrink() : BingoBoardWidget(userBoard,boardSize),
-            ChessBoard(
-              controller: chessBoardController,
-              size: boardSize,
-              boardColor: BoardColor.darkBrown,
-              blackPieceColor: Colors.white,
-            ),
-            LobbyPage(widget.client, style: LobbyStyle.tersePort, width: 320, buttonsBkgCol: Colors.black,
-                chatArea: ZugChat(widget.client,width: 320)),
-          ],
-        )),
-        SizedBox(
-            height: 480,
-            child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal, child: Row(
-              children: List.generate(otherBoards.length,
-                      (index) => BingoBoardWidget(otherBoards.elementAt(index),boardSize/2)
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+      Expanded(child: Column(
+        children: [
+          if (widget.client.currentGame.phase != null) Text(
+            "${widget.client.currentGame.title} (${widget.client.currentGame.phase})",
+            style: txtStyle,
+          ),
+          const SizedBox(height: 16),
+          if (isActiveGame) ElevatedButton(onPressed: () => widget.client.areaCmd(GameMsg.instaBingo),
+              style: ButtonStyle(
+                  backgroundColor: WidgetStateColor.resolveWith((state) => Colors.greenAccent), //foregroundColor: WidgetStateColor.resolveWith((state) => Colors.black),
               ),
-            )))
-      ],
-    );
+              child: const Text("Insta-Bingo",style: TextStyle(color: Colors.black))),
+          Expanded(
+              child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              if (userBoard != null) BingoBoardWidget(userBoard, boardSize, borderColor: borderColor),
+              ChessBoard(
+                controller: chessBoardController,
+                size: boardSize,
+                boardColor: BoardColor.darkBrown,
+                blackPieceColor: Colors.white,
+              ),
+            ],
+          )),
+          SizedBox(
+              height: 480,
+              child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: List.generate(
+                        otherBoards.length,
+                        (index) => BingoBoardWidget(borderColor: borderColor,
+                            otherBoards.elementAt(index), boardSize / 2)),
+                  )))
+        ],
+      )),
+      BingoLobby(widget.client,
+          style: LobbyStyle.tersePort,
+          width: 320,
+          buttonsBkgCol: Colors.black,
+          areaFlex: 1,
+          chatArea: ZugChat(widget.client, width: 320))
+    ]);
   }
 
   Widget getPortraitLayout(BingoBoard? userBoard,List<BingoBoard> otherBoards,BoxConstraints constraints) {
@@ -79,7 +101,13 @@ class _MainPageState extends State<GamePage> {
 class BingoBoardWidget extends StatelessWidget {
   final double size;
   final BingoBoard board;
-  const BingoBoardWidget(this.board,this.size,{super.key});
+  final Color borderColor, checkColor, uncheckColor;
+  const BingoBoardWidget(this.board, this.size, {
+        required this.borderColor,
+        this.checkColor = Colors.green,
+        this.uncheckColor = Colors.black,
+        super.key}
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -101,8 +129,8 @@ class BingoBoardWidget extends StatelessWidget {
           BingoSquare cell = board.squares.elementAt((y * board.dim) + x);
           return Container(
             decoration: BoxDecoration(
-              color: cell.checked > 0 ? Colors.green : Colors.black,
-              border: Border.all(color: Colors.brown,width: 2),
+              color: cell.checked > 0 ? checkColor : uncheckColor,
+              border: Border.all(color: borderColor,width: 1),
             ),
             width:  gridSize/board.dim,
             height: gridSize/board.dim,

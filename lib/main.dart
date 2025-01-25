@@ -10,7 +10,7 @@ import 'game_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  String appName = "GameApp";
+  String appName = "Bingo Chess";
   ZugUtils.getIniDefaults("defaults.ini").then((defaults) {
     ZugUtils.getPrefs().then((prefs) {
       String domain = defaults["domain"] ?? "bingochess.com";
@@ -40,8 +40,43 @@ class GameApp extends ZugApp {
   }
 
   @override
-  Widget createMainPage(client) {
-    return GamePage(client);
+  Widget createMainPage(client) => GamePage(client);
+
+  @override
+  Widget createLobbyPage(client) => BingoLobby(client);
+
+}
+
+class BingoLobby extends LobbyPage {
+  const BingoLobby(super.client, {
+    super.backgroundImage,
+    super.areaName = "BingoGame",
+    super.bkgCol,
+    super.buttonsBkgCol,
+    super.helpPage,
+    super.style = LobbyStyle.normal,
+    super.width,
+    super.borderWidth  = 1,
+    super.borderCol = Colors.white,
+    super.areaFlex  = 3,
+    super.key, super.chatArea});
+
+  @override
+  List<DataColumn> getOccupantHeaders({Color color = Colors.white}) {
+    return [
+      DataColumn(label: Expanded(child: Text("Name",style: TextStyle(color: color)))),
+      DataColumn(label: Expanded(child: Text("Gold",style: TextStyle(color: color)))),
+      DataColumn(label: Expanded(child: Text("Games",style: TextStyle(color: color)))),
+    ];
+  }
+
+  @override
+  DataRow getOccupantData(UniqueName uName, Map<String,dynamic> json, {Color color = Colors.white}) { //print("json: $json , name: $uName");
+    return DataRow(cells: [
+      DataCell(Text(uName.name,style: TextStyle(color: color))),
+      DataCell(Text("${json["user"]["gold"]}", style: TextStyle(color: color))),
+      DataCell(Text("${json["user"]["games"]}", style: TextStyle(color: color))),
+    ]);
   }
 
 }

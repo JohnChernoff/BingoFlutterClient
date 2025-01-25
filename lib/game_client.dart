@@ -1,7 +1,7 @@
 import 'package:zugclient/zug_client.dart';
 import 'game.dart';
 
-enum GameMsg { gameWin, gameLose, top, scoreRank }
+enum GameMsg { phase, gameWin, gameLose, top, scoreRank, instaBingo }
 
 class GameClient extends ZugClient {
 
@@ -14,6 +14,7 @@ class GameClient extends ZugClient {
       GameMsg.gameLose: handleDefeat,
       GameMsg.top: handleTop,
       GameMsg.scoreRank: handleScoreRank,
+      GameMsg.phase : handlePhase,
     });
     if (prefs?.getBool(AudioType.sound.name) == null) {
       prefs?.setBool(AudioType.sound.name, true);
@@ -21,14 +22,17 @@ class GameClient extends ZugClient {
     checkRedirect("lichess.org");
   }
 
+  void handlePhase(data) { //print("New Phase: $data");
+    Area area = getOrCreateArea(data);
+    if (area is Game) area.phase = data["phase"];
+  }
+
   Future<void> handleVictory(data) async {
-    handleUpdateArea(data);
     playClip("victory");
 
   }
 
   Future<void> handleDefeat(data) async {
-    handleUpdateArea(data);
     playClip("defeat");
   }
 
