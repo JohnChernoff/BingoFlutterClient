@@ -18,10 +18,11 @@ class BingoSquare {
 class Game extends Area {
   static String? fen;
   String? phase;
-  int? ante,pot;
+  int? ante,pot, instapot;
   List<BingoBoard> boards = [];
   Game(super.data);
 
+  //TODO: create squareChanged() to reduce spam
   void update(dynamic data,GameClient? client) { //print("data: $data");
     boards.clear();
     List<dynamic> boardList = data["boards"];
@@ -39,6 +40,7 @@ class Game extends Area {
       phase = data["phase"];
       ante = data["ante"];
       pot = data["pot"];
+      instapot = data["instapot"];
     }
   }
 

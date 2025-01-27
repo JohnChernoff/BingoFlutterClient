@@ -13,7 +13,7 @@ void main() {
   String appName = "Bingo Chess";
   ZugUtils.getIniDefaults("defaults.ini").then((defaults) {
     ZugUtils.getPrefs().then((prefs) {
-      String domain = defaults["domain"] ?? "bingochess.com";
+      String domain = defaults["domain"] ?? "chess.bingo";
       int port = int.parse(defaults["port"] ?? "5678");
       String endPoint = defaults["endpoint"] ?? "bingosrv";
       bool localServer = bool.parse(defaults["localServer"] ?? "true");

@@ -820,9 +820,11 @@ packages:
   zugclient:
     dependency: "direct main"
     description:
-      path: "C:\\Users\\jac107\\IdeaProjects\\flutter\\zugclient"
-      relative: false
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: e87e30726e53d40c04b7d7ae4e1f719465214b64
+      url: "https://github.com/JohnChernoff/zugclient"
+    source: git
     version: "0.2.3"
 sdks:
   dart: ">=3.5.4 <4.0.0"

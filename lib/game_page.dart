@@ -3,12 +3,13 @@ import 'package:flutter_chess_board/flutter_chess_board.dart' hide Color;
 import 'package:zugclient/lobby_page.dart';
 import 'package:zugclient/zug_chat.dart';
 import 'package:zugclient/zug_fields.dart';
+import 'bingo_board_widget.dart';
 import 'game.dart';
 import 'game_client.dart';
 import 'main.dart';
 
 class GamePage extends StatefulWidget {
-  static TextStyle textStyle = const TextStyle(color: Colors.white);
+  static TextStyle txtStyle = const TextStyle(color: Colors.white);
   final GameClient client;
   const GamePage(this.client, {super.key});
 
@@ -38,11 +39,40 @@ class _MainPageState extends State<GamePage> {
     ));
   }
 
+  ButtonStyle getInstaButtStyle(dynamic player, {pressCol = Colors.redAccent, pressedCol = Colors.lightBlueAccent, normCol = Colors.greenAccent}) {
+    return ButtonStyle(
+      backgroundColor: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+        if (states.contains(WidgetState.pressed)) {
+          return pressCol;
+        }
+        else {
+          if (player != null && player["instatry"] == true) {
+            return pressedCol;
+          } else {
+            return normCol;
+          }
+        } // Use the component's default.
+      },
+      ),
+    );
+  }
+
+  Widget getTextBox(String txt, Color color, {txtCol = Colors.black, borderCol = Colors.white, borderWidth = 1}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: color,
+        border: Border.all(color: borderCol, width: borderWidth)
+      ),
+      child: Text(txt,style: TextStyle(color: txtCol)),
+    );
+  }
+
   Widget getLandscapeLayout(BingoBoard? userBoard,List<BingoBoard> otherBoards,BoxConstraints constraints) {
-    TextStyle txtStyle = const TextStyle(color: Colors.white);
+    dynamic player = widget.client.currentGame.getOccupant(widget.client.userName);
+
     bool isRunning = widget.client.currentGame.phase == "running";
     Color borderColor = isRunning ? Colors.white : Colors.brown;
-    bool isActiveGame = isRunning && widget.client.currentGame.containsOccupant(widget.client.userName);
+    bool isActiveGame = isRunning && player != null;
     double boardSize = constraints.maxWidth / 4;
     return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -51,13 +81,20 @@ class _MainPageState extends State<GamePage> {
         children: [
           if (widget.client.currentGame.phase != null) Text(
             "${widget.client.currentGame.title} (${widget.client.currentGame.phase})",
-            style: txtStyle,
+            style: GamePage.txtStyle,
           ),
           const SizedBox(height: 16),
+          if (widget.client.currentGame.phase != null) Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              getTextBox("Ante: ${widget.client.currentGame.ante} ",Colors.redAccent),
+              getTextBox("Pot: ${widget.client.currentGame.pot} ",Colors.greenAccent),
+              getTextBox("Insta-Pot: ${widget.client.currentGame.instapot} ",Colors.blueAccent),
+              ]
+          ),
+          if (isActiveGame) const SizedBox(height: 16),
           if (isActiveGame) ElevatedButton(onPressed: () => widget.client.areaCmd(GameMsg.instaBingo),
-              style: ButtonStyle(
-                  backgroundColor: WidgetStateColor.resolveWith((state) => Colors.greenAccent), //foregroundColor: WidgetStateColor.resolveWith((state) => Colors.black),
-              ),
+              style: getInstaButtStyle(player, normCol: Colors.green),
               child: const Text("Insta-Bingo",style: TextStyle(color: Colors.black))),
           Expanded(
               child: Row(
@@ -98,48 +135,3 @@ class _MainPageState extends State<GamePage> {
   }
 }
 
-class BingoBoardWidget extends StatelessWidget {
-  final double size;
-  final BingoBoard board;
-  final Color borderColor, checkColor, uncheckColor;
-  const BingoBoardWidget(this.board, this.size, {
-        required this.borderColor,
-        this.checkColor = Colors.green,
-        this.uncheckColor = Colors.black,
-        super.key}
-      );
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-        width: size, height: size,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(board.playerName.name, style: GamePage.textStyle),
-            getGrid(size - 36)
-          ],
-        ));
-  }
-
-  Widget getGrid(double gridSize) {
-    return Column(
-      children: List.generate(board.dim, (y) => Row(
-        children: List.generate(board.dim, (x) {
-          BingoSquare cell = board.squares.elementAt((y * board.dim) + x);
-          return Container(
-            decoration: BoxDecoration(
-              color: cell.checked > 0 ? checkColor : uncheckColor,
-              border: Border.all(color: borderColor,width: 1),
-            ),
-            width:  gridSize/board.dim,
-            height: gridSize/board.dim,
-            child: Center(child: Text(cell.chessSqr,style: GamePage.textStyle),
-            ),
-          );
-        }),
-      )),
-    );
-  }
-
-}
