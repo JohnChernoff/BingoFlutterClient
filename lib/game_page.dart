@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart' hide Color;
 import 'package:zugclient/lobby_page.dart';
@@ -73,61 +74,72 @@ class _MainPageState extends State<GamePage> {
     bool isRunning = widget.client.currentGame.phase == "running";
     Color borderColor = isRunning ? Colors.white : Colors.brown;
     bool isActiveGame = isRunning && player != null;
-    double boardSize = constraints.maxWidth / 4;
+    double headerHeight = 128;
+    double boardSize = min(constraints.maxWidth / 4,constraints.maxHeight * .8);
+    double upperHeight = boardSize + headerHeight;
+    double bottomHeight = constraints.maxHeight - upperHeight;
+
     return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-      Expanded(child: Column(
-        children: [
-          if (widget.client.currentGame.phase != null) Text(
-            "${widget.client.currentGame.title} (${widget.client.currentGame.phase})",
-            style: GamePage.txtStyle,
-          ),
-          const SizedBox(height: 16),
-          if (widget.client.currentGame.phase != null) Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              getTextBox("Ante: ${widget.client.currentGame.ante} ",Colors.redAccent),
-              getTextBox("Pot: ${widget.client.currentGame.pot} ",Colors.greenAccent),
-              getTextBox("Insta-Pot: ${widget.client.currentGame.instapot} ",Colors.blueAccent),
-              ]
-          ),
-          if (isActiveGame) const SizedBox(height: 16),
-          if (isActiveGame) ElevatedButton(onPressed: () => widget.client.areaCmd(GameMsg.instaBingo),
-              style: getInstaButtStyle(player, normCol: Colors.green),
-              child: const Text("Insta-Bingo",style: TextStyle(color: Colors.black))),
-          Expanded(
-              child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              if (userBoard != null) BingoBoardWidget(userBoard, boardSize, borderColor: borderColor),
-              ChessBoard(
-                controller: chessBoardController,
-                size: boardSize,
-                boardColor: BoardColor.darkBrown,
-                blackPieceColor: Colors.white,
-              ),
-            ],
-          )),
           SizedBox(
-              height: 480,
+            //height: upperHeight,
+            child: Column(
+            children: [
+            //status
+            if (widget.client.currentGame.phase != null) Text(
+              "${widget.client.currentGame.title} (${widget.client.currentGame.phase})",
+              style: GamePage.txtStyle,
+            ),
+            const SizedBox(height: 16),
+            //info
+            if (widget.client.currentGame.phase != null) Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                getTextBox("Ante: ${widget.client.currentGame.ante} ",Colors.redAccent),
+                getTextBox("Pot: ${widget.client.currentGame.pot} ",Colors.greenAccent),
+                getTextBox("Insta-Pot: ${widget.client.currentGame.instapot} ",Colors.blueAccent),
+                ]
+            ),
+            const SizedBox(height: 16),
+            //Insta-Bingo Button
+            if (isActiveGame) ElevatedButton(onPressed: () => widget.client.areaCmd(GameMsg.instaBingo),
+                style: getInstaButtStyle(player, normCol: Colors.green),
+                child: const Text("Insta-Bingo",style: TextStyle(color: Colors.black))),
+            const SizedBox(height: 16),
+            //TV and user boards
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                if (userBoard != null) BingoBoardWidget(userBoard, boardSize, borderColor: borderColor),
+                ChessBoard(
+                  controller: chessBoardController,
+                  size: boardSize,
+                  boardColor: BoardColor.darkBrown,
+                  blackPieceColor: Colors.white,
+                ),
+              ],
+            ),
+            //other player boards
+            SizedBox(
+              height: bottomHeight,
               child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: List.generate(
                         otherBoards.length,
                         (index) => BingoBoardWidget(borderColor: borderColor,
-                            otherBoards.elementAt(index), boardSize / 2)),
-                  )))
-        ],
-      )),
-      BingoLobby(widget.client,
+                            otherBoards.elementAt(index), bottomHeight * .8)),
+                  ))),
+            ]),
+          ),
+        BingoLobby(widget.client,
           style: LobbyStyle.tersePort,
           width: 320,
           buttonsBkgCol: Colors.black,
           areaFlex: 1,
           chatArea: ZugChat(widget.client, width: 320))
-    ]);
+      ]);
   }
 
   Widget getPortraitLayout(BingoBoard? userBoard,List<BingoBoard> otherBoards,BoxConstraints constraints) {
