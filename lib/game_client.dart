@@ -1,7 +1,7 @@
 import 'package:zugclient/zug_client.dart';
 import 'game.dart';
 
-enum GameMsg { phase, gameWin, gameLose, top, scoreRank, instaBingo }
+enum GameMsg { phase, gameWin, gameLose, top, scoreRank, instaBingo, rob }
 
 class GameClient extends ZugClient {
 
@@ -47,9 +47,7 @@ class GameClient extends ZugClient {
   @override
   bool handleUpdateArea(data) {
     super.handleUpdateArea(data);
-    Area area = getOrCreateArea(data);
-    if (area is Game) area.update(data, this);
-    return true;
+    return getOrCreateArea(data).updateArea(data);
   }
 
   @override

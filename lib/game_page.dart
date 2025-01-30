@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart' hide Color;
 import 'package:zugclient/lobby_page.dart';
 import 'package:zugclient/zug_chat.dart';
+import 'package:zugclient/zug_client.dart';
 import 'package:zugclient/zug_fields.dart';
 import 'bingo_board_widget.dart';
 import 'game.dart';
@@ -19,6 +20,7 @@ class GamePage extends StatefulWidget {
 }
 
 class _MainPageState extends State<GamePage> {
+  SquareCoord? selectedSquare;
   ChessBoardController chessBoardController = ChessBoardController();
 
   @override
@@ -56,6 +58,12 @@ class _MainPageState extends State<GamePage> {
       },
       ),
     );
+  }
+
+  void handleTap(int row, int col, UniqueName oppName) {
+    widget.client.areaCmd(GameMsg.rob,data: {
+      "row": row, "col": col, fieldUniqueName : oppName.toJSON()
+    });
   }
 
   Widget getTextBox(String txt, Color color, {txtCol = Colors.black, borderCol = Colors.white, borderWidth = 1}) {
@@ -111,12 +119,19 @@ class _MainPageState extends State<GamePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                if (userBoard != null) BingoBoardWidget(userBoard, boardSize, borderColor: borderColor),
+                if (userBoard != null) BingoBoardWidget(userBoard, boardSize,
+                    borderColor: borderColor,
+                    selectedSquare: selectedSquare,
+                    onTap: (x,y) => {}
+                ),
                 ChessBoard(
                   controller: chessBoardController,
                   size: boardSize,
                   boardColor: BoardColor.darkBrown,
                   blackPieceColor: Colors.white,
+                  onSquareSelect: (sqr,selected) {
+                    if (selected) { setState(() { selectedSquare = sqr; }); }
+                  },
                 ),
               ],
             ),
@@ -128,8 +143,12 @@ class _MainPageState extends State<GamePage> {
                   child: Row(
                     children: List.generate(
                         otherBoards.length,
-                        (index) => BingoBoardWidget(borderColor: borderColor,
-                            otherBoards.elementAt(index), bottomHeight * .8)),
+                        (index) => BingoBoardWidget(
+                            otherBoards.elementAt(index), bottomHeight * .8,
+                            borderColor: borderColor,
+                            onTap: (x,y) => handleTap(x, y, otherBoards.elementAt(index).playerName),
+                        ),
+                    ),
                   ))),
             ]),
           ),

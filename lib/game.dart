@@ -22,8 +22,14 @@ class Game extends Area {
   List<BingoBoard> boards = [];
   Game(super.data);
 
+  @override
+  bool updateArea(Map<String,dynamic> data) {
+    update(data);
+    return super.updateArea(data);
+  }
+
   //TODO: create squareChanged() to reduce spam
-  void update(dynamic data,GameClient? client) { //print("data: $data");
+  void update(dynamic data,{ GameClient? client } ) { //print("data: $data");
     boards.clear();
     List<dynamic> boardList = data["boards"];
     for (dynamic boardData in boardList) {
