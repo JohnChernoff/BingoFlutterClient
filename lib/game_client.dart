@@ -1,10 +1,37 @@
+import 'package:zugclient/zug_app.dart';
 import 'package:zugclient/zug_client.dart';
+import 'dialogs.dart';
 import 'game.dart';
 
-enum GameMsg { phase, gameWin, gameLose, top, scoreRank, instaBingo, rob }
+enum GameMsg { phase, gameWin, gameLose, top, instaBingo, rob, newFeatured, fetchFeatured }
+
+class TvGame {
+  final String wName, bName, wTitle, bTitle;
+  final int wRating, bRating;
+  int wClock, bClock;
+
+  TvGame(this.bName, this.bTitle, this.bRating, this.bClock, this.wName, this.wTitle, this.wRating, this.wClock);
+
+  String formatDuration(int totalSeconds) {
+    final duration = Duration(seconds: totalSeconds);
+    final minutes = duration.inMinutes;
+    final seconds = totalSeconds % 60;
+
+    final minutesString = '$minutes'.padLeft(2, '0');
+    final secondsString = '$seconds'.padLeft(2, '0');
+    return '$minutesString:$secondsString';
+  }
+
+  String getPlayerString(GameSide turn) {
+    if (turn == GameSide.white) return "$wTitle $wName ($wRating) : ${formatDuration(wClock)}";
+    return "$bTitle $bName ($bRating) : ${formatDuration(bClock)}";
+  }
+}
 
 class GameClient extends ZugClient {
 
+  TvGame? tvGame;
+  bool helpMode = false;
   Game get currentGame => currentArea as Game;
 
   GameClient(super.domain, super.port, super.remoteEndpoint, super.prefs, {super.localServer}) { showServMess = true;
@@ -13,13 +40,18 @@ class GameClient extends ZugClient {
       GameMsg.gameWin: handleVictory,
       GameMsg.gameLose: handleDefeat,
       GameMsg.top: handleTop,
-      GameMsg.scoreRank: handleScoreRank,
       GameMsg.phase : handlePhase,
+      GameMsg.newFeatured : handleFeatured,
     });
     if (prefs?.getBool(AudioType.sound.name) == null) {
       prefs?.setBool(AudioType.sound.name, true);
     }
     checkRedirect("lichess.org");
+  }
+
+  void setHelpMode(bool b) {
+    helpMode = b;
+    notifyListeners();
   }
 
   void handlePhase(data) { //print("New Phase: $data");
@@ -37,17 +69,18 @@ class GameClient extends ZugClient {
   }
 
   void handleTop(data) {
-    //TopDialog(zugAppNavigatorKey.currentContext!,data["scores"] as List<dynamic>).raise();
+    TopDialog(zugAppNavigatorKey.currentContext!,data["users"] as List<dynamic>).raise();
   }
 
-  void handleScoreRank(data) {
-    //InfoDialog(zugAppNavigatorKey.currentContext!, "Your score ranks ${getPlace(data["rank"])} (out of ${data["scores"]})").raise();
+  void handleFeatured(data) {
+      tvGame = TvGame(data["bName"],data["bTitle"], data["bRating"], data["bClock"], data["wName"], data["wTitle"], data["wRating"], data["wClock"]);
   }
 
   @override
   bool handleUpdateArea(data) {
-    super.handleUpdateArea(data);
-    return getOrCreateArea(data).updateArea(data);
+    tvGame?.bClock = data["bClock"];
+    tvGame?.wClock = data["wClock"];
+    return super.handleUpdateArea(data); //getOrCreateArea(data).updateArea(data);
   }
 
   @override

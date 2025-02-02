@@ -15,11 +15,14 @@ class BingoSquare {
   BingoSquare(this.chessSqr,this.checked);
 }
 
+enum GameSide{white,black}
 class Game extends Area {
+
   static String? fen;
   String? phase;
   int? ante,pot, instapot;
   List<BingoBoard> boards = [];
+  GameSide lastTurn = GameSide.white;
   Game(super.data);
 
   @override
@@ -42,11 +45,18 @@ class Game extends Area {
         ));
       }
       boards.add(BingoBoard(UniqueName.fromData(boardData[fieldUser]), sqrList,data["dim"]));
-      fen = data["fen"];
       phase = data["phase"];
       ante = data["ante"];
       pot = data["pot"];
       instapot = data["instapot"];
+      fen = data["fen"];
+      List<String> fenFields = fen!.split(" ");
+      if (fenFields.length > 1) {
+        lastTurn = fenFields.elementAt(1) == "w" ? GameSide.white : GameSide.black;
+      }
+      else {
+        lastTurn = lastTurn == GameSide.white ? GameSide.black : GameSide.white;
+      }
     }
   }
 
@@ -60,8 +70,3 @@ class Game extends Area {
   }
 
 }
-
-/*
-data: {title: AnselAdamsraccoon, phase: initializing, phase_time_remaining: -1737494614461, exists: true, creator: {source: none, name: AnselAdamsraccoon}, fen: r2q1rk1/bp3ppp/2p1bnn1/p2pp3/4P3/2PP1NN1/PPB2PPP/R1BQR1K1, dim: 5, boards: [{away: false, banned: false, user: {logged_in: true, uname: {source: none, name: AnselAdamsraccoon}}, squares: [{checked: false, square: G3}, {checked: false, square: D5}, {checked: false, square: E5}, {checked: false, square: A4}, {checked: false, square: F7}, {checked: false, square: D8}, {checked: false, square: G6}, {checked: false, square: F6}, {checked: false, square: B1}, {checked: false, square: NONE}, {checked: false, square: F8}, {checked: false, square: E4}, {checked: false, square: F3}, {checked: false, square: E6}, {checked: false, square: B7}, {checked: false, square: G5}, {checked: false, square: H4}, {checked: false, square: B3}, {checked: false, square: C2}, {checked: false, square: F5}, {checked: false, square: G1}, {checked: false, square: B4}, {checked: false, square: C3}, {checked: false, square: E8}, {checked: false, square: D3}]}]}
-INFO: 2025-01-21 13:23:35.374: Sending: ClientMsg.setDeaf, {deafened: false, title: AnselAdamsraccoon}
- */

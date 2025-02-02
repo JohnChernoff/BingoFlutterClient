@@ -1,6 +1,10 @@
 import 'dart:developer';
+import 'package:bingo_client/dialogs.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
+import 'package:universal_html/js.dart';
 import 'package:zug_utils/zug_utils.dart';
 import 'package:zugclient/lobby_page.dart';
 import 'package:zugclient/zug_app.dart';
@@ -26,7 +30,7 @@ void main() {
 
 class GameApp extends ZugApp {
   GameApp(super.client, super.appName,
-      {super.key, super.logLevel = Level.INFO, super.noNav = true});
+      {super.key, super.logLevel = Level.INFO, super.noNav = kIsWeb});
 
   @override
   AppBar createAppBar(BuildContext context, ZugClient client,
@@ -53,8 +57,7 @@ class BingoLobby extends LobbyPage {
     super.areaName = "BingoGame",
     super.bkgCol,
     super.buttonsBkgCol,
-    super.helpPage,
-    super.style = LobbyStyle.normal,
+    super.style = LobbyStyle.tersePort,
     super.width,
     super.borderWidth  = 1,
     super.borderCol = Colors.white,
@@ -77,6 +80,22 @@ class BingoLobby extends LobbyPage {
       DataCell(Text("${json["user"]["gold"]}", style: TextStyle(color: color))),
       DataCell(Text("${json["user"]["games"]}", style: TextStyle(color: color))),
     ]);
+  }
+
+  @override
+  List<Widget> getExtraCmdButtons() {
+    return [
+      ElevatedButton(
+          style: getButtonStyle(Colors.white, Colors.greenAccent),
+          onPressed: () async => HelpDialog(client as GameClient,await rootBundle.loadString('txt/help.txt')).raise(),
+          child: Text("Help", style: getButtonTextStyle())
+      ),
+      ElevatedButton(
+          style: getButtonStyle(Colors.purple, Colors.redAccent),
+          onPressed: () => client.send(GameMsg.top),
+          child: Text("Scores", style: getButtonTextStyle())
+      ),
+    ];
   }
 
 }
