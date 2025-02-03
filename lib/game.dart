@@ -7,6 +7,10 @@ class BingoBoard {
   final UniqueName playerName;
   final List<BingoSquare> squares;
   BingoBoard(this.playerName,this.squares,this.dim);
+
+  Iterable<BingoSquare> getChecked() {
+    return squares.where((sqr) => sqr.checked > 0);
+  }
 }
 
 class BingoSquare {

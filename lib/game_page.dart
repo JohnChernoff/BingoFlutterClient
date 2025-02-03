@@ -9,6 +9,7 @@ import 'package:zugclient/zug_chat.dart';
 import 'package:zugclient/zug_client.dart';
 import 'package:zugclient/zug_fields.dart';
 import 'bingo_board_widget.dart';
+import 'bingo_board_widget2.dart';
 import 'game.dart';
 import 'game_client.dart';
 import 'main.dart';
@@ -197,10 +198,8 @@ class _GamePageState extends State<GamePage> {
   }
 
   Widget getMainBoardsWidget(BingoBoard? userBoard,double boardSize,Color borderColor, Axis axis) {
-    Widget bbw = userBoard != null ? BingoBoardWidget(userBoard, boardSize,
-        borderColor: borderColor,
-        selectedSquare: selectedSquare,
-        onTap: (x,y) => {}
+    Widget bbw = userBoard != null ? BingoBoardWidget2(widget.client.currentGame,userBoard,boardSize //(userBoard, boardSize,
+        //borderColor: borderColor, selectedSquare: selectedSquare, onTap: (x,y) => {}
     ) : const SizedBox.shrink();
     Widget tv = widget.client.currentGame != widget.client.noArea
         ? getTvBoard(boardSize)

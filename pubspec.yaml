@@ -73,3 +73,6 @@ flutter:
 
 assets:
   - txt/help.txt
+  - images/bingo_board.png
+  - images/bingo_board_fin.png
+  - images/bingo_check.png
