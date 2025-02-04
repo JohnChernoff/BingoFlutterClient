@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart' hide Color;
 import 'package:zugclient/lobby_page.dart';
-import 'package:zugclient/zug_app.dart';
 import 'package:zugclient/zug_chat.dart';
 import 'package:zugclient/zug_client.dart';
 import 'package:zugclient/zug_fields.dart';
@@ -76,24 +75,6 @@ class _GamePageState extends State<GamePage> {
     }
   }
 
-  ButtonStyle getInstaButtStyle(dynamic player, {pressCol = Colors.redAccent, pressedCol = Colors.lightBlueAccent, normCol = Colors.greenAccent}) {
-    return ButtonStyle(
-      backgroundColor: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
-        if (states.contains(WidgetState.pressed)) {
-          return pressCol;
-        }
-        else {
-          if (player != null && player["instatry"] == true) {
-            return pressedCol;
-          } else {
-            return normCol;
-          }
-        } // Use the component's default.
-      },
-      ),
-    );
-  }
-
   void handleTap(int row, int col, UniqueName oppName) {
     widget.client.areaCmd(GameMsg.rob,data: {
       "row": row, "col": col, fieldUniqueName : oppName.toJSON()
@@ -104,7 +85,7 @@ class _GamePageState extends State<GamePage> {
     if (kIsWeb) {
       return MouseRegion(
         onEnter: (e) {
-          mouseOff = e.position; print(mouseOff);
+          mouseOff = e.position; //print(mouseOff);
           setState(() => helpArea = area);
         },
         onExit: (e) => setState(() => helpArea = HelpArea.none),
@@ -163,18 +144,8 @@ class _GamePageState extends State<GamePage> {
     ])));
   }
 
-  Widget getStatusWidget() {
-    if (widget.client.currentGame.phase != null) {
-      return Text(
-        "${widget.client.currentGame.title} (${widget.client.currentGame.phase})",
-        style: GamePage.txtStyle,
-      );
-    }
-    return const SizedBox.shrink();
-  }
-
   Widget getInfoWidget() {
-    if (widget.client.currentGame.phase != null) {
+    if (widget.client.currentGame.phase != GamePhase.unknown) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -187,19 +158,9 @@ class _GamePageState extends State<GamePage> {
     return const SizedBox.shrink();
   }
 
-  Widget getInstaWidget() {
-    dynamic player = widget.client.currentGame.getOccupant(widget.client.userName);
-    if (widget.client.currentGame.phase == "running" && player != null) {
-      return ElevatedButton(onPressed: () => widget.client.areaCmd(GameMsg.instaBingo),
-          style: getInstaButtStyle(player, normCol: Colors.green),
-          child: const Text("Insta-Bingo",style: TextStyle(color: Colors.black)));
-    }
-    return const SizedBox.shrink();
-  }
-
   Widget getMainBoardsWidget(BingoBoard? userBoard,double boardSize,Color borderColor, Axis axis) {
-    Widget bbw = userBoard != null ? BingoBoardWidget2(widget.client.currentGame,userBoard,boardSize //(userBoard, boardSize,
-        //borderColor: borderColor, selectedSquare: selectedSquare, onTap: (x,y) => {}
+    Widget bbw = userBoard != null ? BingoBoardWidget2(
+        widget.client,widget.client.currentGame,userBoard,selectedSquare,boardSize
     ) : const SizedBox.shrink();
     Widget tv = widget.client.currentGame != widget.client.noArea
         ? getTvBoard(boardSize)
@@ -234,7 +195,7 @@ class _GamePageState extends State<GamePage> {
   }
 
   Widget getLandscapeLayout(BingoBoard? userBoard,List<BingoBoard> otherBoards,BoxConstraints constraints) {
-    bool isRunning = widget.client.currentGame.phase == "running";
+    bool isRunning = widget.client.currentGame.phase == GamePhase.running;
     Color borderColor = isRunning ? Colors.white : Colors.brown;
     double headerHeight = 128;
     double boardSize = min(constraints.maxWidth / 4,constraints.maxHeight * .8);
@@ -246,11 +207,7 @@ class _GamePageState extends State<GamePage> {
         children: [
           Column(
               children: [
-                getStatusWidget(),
-                const SizedBox(height: 16),
                 widget.client.helpMode ? getHelpWrapper(getInfoWidget(), HelpArea.info) : getInfoWidget(),
-                const SizedBox(height: 16),
-                widget.client.helpMode ? getHelpWrapper(getInstaWidget(), HelpArea.insta) : getInstaWidget(),
                 const SizedBox(height: 16),
                 getMainBoardsWidget(userBoard, boardSize, borderColor, Axis.horizontal),
                 widget.client.helpMode
@@ -268,7 +225,7 @@ class _GamePageState extends State<GamePage> {
   }
 
   Widget getPortraitLayout(BingoBoard? userBoard,List<BingoBoard> otherBoards,BoxConstraints constraints) {
-    bool isRunning = widget.client.currentGame.phase == "running";
+    bool isRunning = widget.client.currentGame.phase == GamePhase.running;
     Color borderColor = isRunning ? Colors.white : Colors.brown;
     double boardSize = constraints.maxWidth * .8;
 
@@ -276,8 +233,6 @@ class _GamePageState extends State<GamePage> {
       children: [
         const SizedBox(height: 16),
         getInfoWidget(),
-        const SizedBox(height: 16),
-        getInstaWidget(),
         const SizedBox(height: 16),
         getMainBoardsWidget(userBoard, boardSize, borderColor, Axis.vertical),
         const SizedBox(height: 16),

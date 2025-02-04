@@ -19,14 +19,23 @@ class BingoSquare {
   BingoSquare(this.chessSqr,this.checked);
 }
 
+enum GamePhase{pregame,running,finished,unknown}
 enum GameSide{white,black}
 class Game extends Area {
 
   static String? fen;
-  String? phase;
+  GamePhase phase = GamePhase.unknown;
   int? ante,pot, instapot;
   List<BingoBoard> boards = [];
   GameSide lastTurn = GameSide.white;
+
+  void setPhase(dynamic p) => phase = switch(p as String) {
+    "pregame" => GamePhase.pregame,
+    "running" => GamePhase.running,
+    "finished" => GamePhase.finished,
+    String() => GamePhase.unknown
+  };
+
   Game(super.data);
 
   @override
@@ -49,7 +58,7 @@ class Game extends Area {
         ));
       }
       boards.add(BingoBoard(UniqueName.fromData(boardData[fieldUser]), sqrList,data["dim"]));
-      phase = data["phase"];
+      setPhase(data["phase"]);
       ante = data["ante"];
       pot = data["pot"];
       instapot = data["instapot"];

@@ -56,7 +56,7 @@ class GameClient extends ZugClient {
 
   void handlePhase(data) { //print("New Phase: $data");
     Area area = getOrCreateArea(data);
-    if (area is Game) area.phase = data["phase"];
+    if (area is Game) area.setPhase(data["phase"]);
   }
 
   Future<void> handleVictory(data) async {

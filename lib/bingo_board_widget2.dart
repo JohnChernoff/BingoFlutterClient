@@ -1,24 +1,85 @@
+import 'package:bingo_client/game_client.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_chess_board/flutter_chess_board.dart' hide Color;
+import 'package:zug_utils/zug_utils.dart';
+import 'package:zugclient/zug_fields.dart';
 import 'game.dart';
 
 class BingoBoardWidget2 extends StatelessWidget {
+  final GameClient client;
   final double size;
   final BingoBoard board;
   final Game game;
-  const BingoBoardWidget2(this.game,this.board,this.size,{super.key});
+  final SquareCoord? selectedSquare;
+  final int bingColHex;
+  final double imgWidth = 901;
+  final double imgHeight = 890;
+  const BingoBoardWidget2(this.client,this.game,this.board,this.selectedSquare,this.size,{super.key,this.bingColHex = 0xFFE0C4A2});
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> stack = [ game.phase == "finished" ? const Image(image: AssetImage("images/bingo_board_fin.png")) : const Image(image: AssetImage("images/bingo_board.png"))];
-
-    double xf =  size / 901;
-    double yf = size / 890;
-    Offset offset = Offset(size * (136/901), size * (182/890));
+    double xf =  size / imgWidth;
+    double yf = size / imgHeight;
+    Offset offset = Offset(size * (136/imgWidth), size * (182/imgHeight));
     double sqrWidth = 99 * xf;
     double sqrHeight = 106 * yf;
     double barWidth = 7 * yf;
     double barHeight = 7 * yf;
-    const Color bingCol = Color.fromRGBO(224, 196, 162, 1);
+    double selectBoxWidth = sqrWidth * .75;
+    double selectBoxHeight = sqrHeight * .75;
+    double txtBoxWidth = sqrWidth * .5;
+    double txtBoxHeight = sqrHeight *.5;
+    Offset instaBoxOff = Offset(size * (353/imgWidth),0);
+    double instaBoxWidth = 187 * xf;
+    double instaBoxHeight = 72 * yf;
+    Offset infoBoxOff = Offset(size * (243/imgWidth),size * (753/imgHeight));
+    double infoBoxWidth = 414 * xf;
+    double infoBoxHeight = 97 * yf;
+    Color bingCol = Color(bingColHex); //Color.fromRGBO(224, 196, 162, 1);
+    dynamic player = client.currentGame.getOccupant(client.userName);
+    bool instaPress = game.phase == GamePhase.running && (player != null && player["instatry"] == true);
+
+    List<Widget> stack = [
+      game.phase == GamePhase.finished
+          ? Image(image: ZugUtils.getAssetImage("images/bingo_board_fin.png"))
+          : Image(image: ZugUtils.getAssetImage("images/bingo_board.png")),
+      Positioned(
+          left: instaBoxOff.dx,
+          top: instaBoxOff.dy,
+          width: instaBoxWidth,
+          height: instaBoxHeight,
+          child: TextButton(
+              style: getInstaButtStyle(instaPress),
+              onPressed: switch(game.phase) {
+                GamePhase.pregame => () => client.areaCmd(ClientMsg.startArea),
+                GamePhase.running =>  () => client.areaCmd(GameMsg.instaBingo),
+                GamePhase.finished => () => client.areaCmd(ClientMsg.partArea),
+                GamePhase.unknown => null,
+              },
+              child: FittedBox(
+                  child: Text(switch (game.phase) {
+                        GamePhase.pregame => "Start",
+                        GamePhase.running => "Insta-Bingo",
+                        GamePhase.finished => "Leave",
+                        GamePhase.unknown => "?",
+                      },
+                  style: TextStyle(color: instaPress ? Colors.white : Colors.black))
+              )
+          )
+      ),
+      Positioned(
+          left: infoBoxOff.dx,
+          top: infoBoxOff.dy,
+          width: infoBoxWidth,
+          height: infoBoxHeight,
+          child: SingleChildScrollView(
+              child: Text(
+                game.messages.getLastServMsg()?.message ?? "",
+                style: TextStyle(color: bingCol)
+              )
+          ),
+      )
+    ];
 
     stack.addAll(List.generate(board.squares.length, (i) {
         BingoSquare sqr = board.squares.elementAt(i);
@@ -31,20 +92,34 @@ class BingoBoardWidget2 extends StatelessWidget {
           width: sqrWidth,
           top: offset.dy + ((sqrHeight + barHeight) * col),
           height: sqrHeight,
-          child: sqr.checked > 0 ? Center(child: Container(
-              width: sqrWidth * .5,
-              height: sqrHeight * .5,
-              decoration: const BoxDecoration(
-                  color: bingCol, //Color.fromRGBO(255, 255, 0, .75), //
+          child: Center(child: Container(
+              width: selectBoxWidth,
+              height: selectBoxHeight,
+              decoration: BoxDecoration(
+                  color:  sqr.checked > 0 ? bingCol : null, //Color.fromRGBO(255, 255, 0, .75), //
                   shape: BoxShape.circle,
-
-              ), child: boxTxt)) : boxTxt
+                  border: selectedSquare?.name == sqr.chessSqr.toLowerCase() ? Border.all(color: Colors.white,width: 4) : null,
+              ),
+              child: Center(child: SizedBox(
+                  width: txtBoxWidth,
+                  height: txtBoxHeight,
+                  child: FittedBox(child: boxTxt)
+              ))
+          ))
         ); // : const SizedBox.shrink();
     }
     ));
     return SizedBox(width: size, height: size, child: Stack(
       children: stack,
     ));
+  }
+
+  ButtonStyle getInstaButtStyle(bool pressed) {
+    return ButtonStyle(
+      shape:  WidgetStateProperty.resolveWith<OutlinedBorder>((Set<WidgetState> states) => const BeveledRectangleBorder()),
+      backgroundColor: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) =>
+      pressed ? const Color.fromRGBO(255,0,0,.5) : null),
+    );
   }
 
 }
