@@ -3,6 +3,7 @@ import 'package:bingo_client/help_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart' hide Color;
+import 'package:zug_utils/zug_utils.dart';
 import 'package:zugclient/lobby_page.dart';
 import 'package:zugclient/zug_chat.dart';
 import 'package:zugclient/zug_client.dart';
@@ -202,20 +203,22 @@ class _GamePageState extends State<GamePage> {
     double upperHeight = boardSize + headerHeight;
     double bottomHeight = constraints.maxHeight - upperHeight;
 
-    return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Row( //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Column(
-              children: [
-                widget.client.helpMode ? getHelpWrapper(getInfoWidget(), HelpArea.info) : getInfoWidget(),
-                const SizedBox(height: 16),
-                getMainBoardsWidget(userBoard, boardSize, borderColor, Axis.horizontal),
-                widget.client.helpMode
-                    ? getHelpWrapper(getOtherBoardsWidget(otherBoards, bottomHeight, borderColor, Axis.horizontal),
-                    HelpArea.otherBoard)
-                    : getOtherBoardsWidget(otherBoards, bottomHeight, borderColor, Axis.horizontal),
-              ]),
-            BingoLobby(widget.client,
+          Expanded(child: (userBoard == null)
+              ? Image(image: ZugUtils.getAssetImage("images/bingo_bkg_land.png"), fit: BoxFit.fill,)
+              : Column(
+                  children: [
+                    widget.client.helpMode ? getHelpWrapper(getInfoWidget(), HelpArea.info) : getInfoWidget(),
+                    const SizedBox(height: 16),
+                    getMainBoardsWidget(userBoard, boardSize, borderColor, Axis.horizontal),
+                    widget.client.helpMode
+                        ? getHelpWrapper(getOtherBoardsWidget(otherBoards, bottomHeight, borderColor, Axis.horizontal),
+                        HelpArea.otherBoard)
+                        : getOtherBoardsWidget(otherBoards, bottomHeight, borderColor, Axis.horizontal),
+                  ]),
+            ),
+          BingoLobby(widget.client,
               style: LobbyStyle.tersePort,
               width: 320,
               buttonsBkgCol: Colors.black,
