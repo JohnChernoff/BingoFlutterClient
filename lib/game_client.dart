@@ -1,5 +1,6 @@
 import 'package:zugclient/zug_app.dart';
 import 'package:zugclient/zug_client.dart';
+import 'package:zugclient/zug_fields.dart';
 import 'dialogs.dart';
 import 'game.dart';
 
@@ -37,9 +38,8 @@ class GameClient extends ZugClient {
   GameClient(super.domain, super.port, super.remoteEndpoint, super.prefs, {super.localServer}) { showServMess = true;
     clientName = "BingoClient";
     addFunctions({
-      GameMsg.gameWin: handleVictory,
-      GameMsg.gameLose: handleDefeat,
-      GameMsg.top: handleTop,
+      ServMsg.updateServ : handleUpdateServ,
+      GameMsg.top : handleTop,
       GameMsg.phase : handlePhase,
       GameMsg.newFeatured : handleFeatured,
     });
@@ -47,6 +47,10 @@ class GameClient extends ZugClient {
       prefs?.setBool(AudioType.sound.name, true);
     }
     checkRedirect("lichess.org");
+  }
+
+  void handleUpdateServ(data) {
+    ZugClient.log.info("Serv: $data");
   }
 
   void setHelpMode(bool b) {
@@ -57,15 +61,6 @@ class GameClient extends ZugClient {
   void handlePhase(data) { //print("New Phase: $data");
     Area area = getOrCreateArea(data);
     if (area is Game) area.setPhase(data["phase"]);
-  }
-
-  Future<void> handleVictory(data) async {
-    playClip("victory");
-
-  }
-
-  Future<void> handleDefeat(data) async {
-    playClip("defeat");
   }
 
   void handleTop(data) {
