@@ -7,11 +7,12 @@ import 'game.dart';
 enum GameMsg { phase, gameWin, gameLose, top, instaBingo, rob, newFeatured, fetchFeatured }
 
 class TvGame {
+  final String initFen;
   final String wName, bName, wTitle, bTitle;
   final int wRating, bRating;
   int wClock, bClock;
 
-  TvGame(this.bName, this.bTitle, this.bRating, this.bClock, this.wName, this.wTitle, this.wRating, this.wClock);
+  TvGame(this.initFen,this.bName, this.bTitle, this.bRating, this.bClock, this.wName, this.wTitle, this.wRating, this.wClock);
 
   String formatDuration(int totalSeconds) {
     final duration = Duration(seconds: totalSeconds);
@@ -68,7 +69,13 @@ class GameClient extends ZugClient {
   }
 
   void handleFeatured(data) {
-      tvGame = TvGame(data["bName"],data["bTitle"], data["bRating"], data["bClock"], data["wName"], data["wTitle"], data["wRating"], data["wClock"]);
+      tvGame = TvGame(data["fen"],data["bName"],data["bTitle"], data["bRating"], data["bClock"], data["wName"], data["wTitle"], data["wRating"], data["wClock"]);
+  }
+
+  @override
+  bool handleUpdateOptions(data, {Area? area}) {
+    bool b = super.handleUpdateOptions(data);
+    return b;
   }
 
   @override

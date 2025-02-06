@@ -42,7 +42,7 @@ class _GamePageState extends State<GamePage> {
   Widget build(BuildContext context) {
     BingoBoard? userBoard = widget.client.currentGame.getBoardByUser(widget.client.userName);
     List<BingoBoard> otherBoards = widget.client.currentGame.getOtherBoards(widget.client.userName);
-    if (Game.fen != null) chessBoardController.loadFen(Game.fen ?? "8/8/8/8/8/8/8/8 w - - 0 1");
+    chessBoardController.loadFen(Game.fen ?? widget.client.tvGame?.initFen ?? "8/8/8/8/8/8/8/8 w - - 0 1");
 
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) =>
         ColoredBox(color: Colors.black, child: Stack(
@@ -223,7 +223,7 @@ class _GamePageState extends State<GamePage> {
               width: 320,
               buttonsBkgCol: Colors.black,
               areaFlex: 1,
-              chatArea: ZugChat(widget.client, width: 320))
+              chatArea: ZugChat(widget.client, width: 320, defScope: MessageScope.server))
       ]);
   }
 
@@ -248,7 +248,7 @@ class _GamePageState extends State<GamePage> {
               width: constraints.maxWidth,
               buttonsBkgCol: Colors.black,
               areaFlex: 1,
-              chatArea: ZugChat(widget.client, width: constraints.maxWidth)),
+              chatArea: ZugChat(widget.client, width: constraints.maxWidth, defScope: MessageScope.server)),
         )
       ],
     ));

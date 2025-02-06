@@ -4,11 +4,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
-import 'package:universal_html/js.dart';
 import 'package:zug_utils/zug_utils.dart';
 import 'package:zugclient/lobby_page.dart';
 import 'package:zugclient/zug_app.dart';
 import 'package:zugclient/zug_client.dart';
+import 'package:zugclient/zug_fields.dart';
 import 'game_client.dart';
 import 'game_page.dart';
 
@@ -91,7 +91,12 @@ class BingoLobby extends LobbyPage {
           child: Text("Help", style: getButtonTextStyle())
       ),
       ElevatedButton(
-          style: getButtonStyle(Colors.purple, Colors.redAccent),
+          style: getButtonStyle(Colors.blue, Colors.greenAccent),
+          onPressed: () {}, //=> client.fetchOptions(() => OptionDialog(client as GameClient).raise()),
+          child: Text("options", style: getButtonTextStyle())
+      ),
+      ElevatedButton(
+          style: getButtonStyle(Colors.green, Colors.redAccent),
           onPressed: () => client.send(GameMsg.top),
           child: Text("Scores", style: getButtonTextStyle())
       ),

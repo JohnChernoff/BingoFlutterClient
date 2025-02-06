@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart' hide Color;
 import 'package:zug_utils/zug_utils.dart';
 import 'package:zugclient/zug_fields.dart';
+import 'dialogs.dart';
 import 'game.dart';
 
 class BingoBoardWidget2 extends StatelessWidget {
@@ -35,6 +36,9 @@ class BingoBoardWidget2 extends StatelessWidget {
     Offset infoBoxOff = Offset(size * (243/imgWidth),size * (753/imgHeight));
     double infoBoxWidth = 414 * xf;
     double infoBoxHeight = 97 * yf;
+    Offset optBoxOff = Offset(size * (399/imgWidth),size * (130/imgHeight));
+    double optBoxWidth = 100 * xf;
+    double optBoxHeight = 36 * yf;
     Color bingCol = Color(bingColHex); //Color.fromRGBO(224, 196, 162, 1);
     dynamic player = client.currentGame.getOccupant(client.userName);
     bool instaPress = game.phase == GamePhase.running && (player != null && player["instatry"] == true);
@@ -78,7 +82,18 @@ class BingoBoardWidget2 extends StatelessWidget {
                 style: TextStyle(color: bingCol)
               )
           ),
-      )
+        ),
+        Positioned(
+            left: optBoxOff.dx,
+            top: optBoxOff.dy,
+            width: optBoxWidth,
+            height: optBoxHeight,
+            child: TextButton(
+                onPressed: () => client.fetchOptions(() => OptionDialog(client,context).raise()),
+                child: const FittedBox(child: Text("options", style: TextStyle(fontWeight: FontWeight.bold),)), //const Icon(Icons.menu),
+                //visualDensity: VisualDensity.compact,
+            )
+        )
     ];
 
     stack.addAll(List.generate(board.squares.length, (i) {
@@ -116,7 +131,7 @@ class BingoBoardWidget2 extends StatelessWidget {
 
   ButtonStyle getInstaButtStyle(bool pressed) {
     return ButtonStyle(
-      shape:  WidgetStateProperty.resolveWith<OutlinedBorder>((Set<WidgetState> states) => const BeveledRectangleBorder()),
+      shape: WidgetStateProperty.resolveWith<OutlinedBorder>((Set<WidgetState> states) => const BeveledRectangleBorder()),
       backgroundColor: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) =>
       pressed ? const Color.fromRGBO(255,0,0,.5) : null),
     );

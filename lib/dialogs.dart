@@ -1,5 +1,7 @@
+import 'dart:math';
 import 'package:bingo_client/game_client.dart';
 import 'package:flutter/material.dart';
+import 'package:zugclient/options_page.dart';
 import 'package:zugclient/zug_app.dart';
 
 class TopDialog {
@@ -25,6 +27,29 @@ class TopDialog {
 
   Widget getCell(String txt, Color bgCol, Color txtCol) {
     return Container(color: bgCol, child: Text(txt,style: TextStyle(color: txtCol)));
+  }
+}
+
+class OptionDialog {
+  GameClient client;
+  BuildContext ctx;
+  OptionDialog(this.client, this.ctx);
+
+  Future<void> raise() async {
+    return showDialog<void>(
+        context: ctx,
+        builder: (BuildContext context) {
+          return LayoutBuilder(builder: (BuildContext buildCtx,BoxConstraints constraints) => Dialog(
+              insetPadding: EdgeInsets.symmetric(vertical: constraints.maxHeight * .25, horizontal: constraints.maxWidth * .25),
+              backgroundColor: Colors.cyan,
+              child: Column(children: [
+                Expanded(child: OptionsPage(client,isDialog: true,headerHeight: 48)),
+                SimpleDialogOption(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Cancel",style: TextStyle(backgroundColor: Colors.white)),
+                ),
+              ])));
+        });
   }
 }
 
@@ -71,3 +96,4 @@ class HelpModeDialogOptionState extends State<HelpModeDialogOption> {
     );
   }
 }
+

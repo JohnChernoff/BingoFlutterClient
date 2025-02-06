@@ -3,8 +3,8 @@ Welcome to Bingo Chess!
 The game is very simple: you have a bingo card with chess squares on it.  Next to it is a chessboard showing a game on lichess TV.  Each time a piece moves to a square on your card you check off that square.
 First player to get five in a row (a "Bingo") wins!
 
-The is one mysterious button, however: the "Insta-Bingo" button.   When you press that, you are betting your ante (50 gold) that you will check off a square next move.   If you do, you gain the power
-to remove a check from any of your opponent's squares!  Additionally, if you get a Bingo next move you win the InstaPot!   The InstaPot collects the antes of every missed InstaBingo try.
+There is one mysterious button, however: the "Insta-Bingo" button.   When you press that, you are betting your ante (50 gold) that you will check off a square next move.   If you do, you gain the power
+to remove a check from any of your opponent's squares!  Additionally, if you get a Bingo next move you win the InstaPot!   The InstaPot collects the antes of each missed InstaBingo try.
 
 For specific help on various areas on your screen, click "Activate Help Mode" and then hover over things you want information about.
 
