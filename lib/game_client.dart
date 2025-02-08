@@ -44,9 +44,6 @@ class GameClient extends ZugClient {
       GameMsg.phase : handlePhase,
       GameMsg.newFeatured : handleFeatured,
     });
-    if (prefs?.getBool(AudioType.sound.name) == null) {
-      prefs?.setBool(AudioType.sound.name, true);
-    }
     checkRedirect("lichess.org");
   }
 
@@ -68,7 +65,7 @@ class GameClient extends ZugClient {
     TopDialog(zugAppNavigatorKey.currentContext!,data["users"] as List<dynamic>).raise();
   }
 
-  void handleFeatured(data) {
+  void handleFeatured(data) { //TODO: null checks
       tvGame = TvGame(data["fen"],data["bName"],data["bTitle"], data["bRating"], data["bClock"], data["wName"], data["wTitle"], data["wRating"], data["wClock"]);
   }
 

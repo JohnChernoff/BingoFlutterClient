@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 import 'package:zug_utils/zug_utils.dart';
 import 'package:zugclient/lobby_page.dart';
+import 'package:zugclient/options_page.dart';
 import 'package:zugclient/zug_app.dart';
 import 'package:zugclient/zug_client.dart';
 import 'package:zugclient/zug_fields.dart';
@@ -83,7 +84,7 @@ class BingoLobby extends LobbyPage {
   }
 
   @override
-  List<Widget> getExtraCmdButtons() {
+  List<Widget> getExtraCmdButtons(BuildContext context) {
     return [
       ElevatedButton(
           style: getButtonStyle(Colors.white, Colors.greenAccent),
@@ -92,7 +93,7 @@ class BingoLobby extends LobbyPage {
       ),
       ElevatedButton(
           style: getButtonStyle(Colors.blue, Colors.greenAccent),
-          onPressed: () {}, //=> client.fetchOptions(() => OptionDialog(client as GameClient).raise()),
+          onPressed: () => OptionDialog(client as GameClient,context,OptionScope.general).raise(),
           child: Text("options", style: getButtonTextStyle())
       ),
       ElevatedButton(

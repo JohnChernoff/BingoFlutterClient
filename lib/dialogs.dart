@@ -33,7 +33,8 @@ class TopDialog {
 class OptionDialog {
   GameClient client;
   BuildContext ctx;
-  OptionDialog(this.client, this.ctx);
+  OptionScope scope;
+  OptionDialog(this.client, this.ctx, this.scope);
 
   Future<void> raise() async {
     return showDialog<void>(
@@ -43,7 +44,7 @@ class OptionDialog {
               insetPadding: EdgeInsets.symmetric(vertical: constraints.maxHeight * .25, horizontal: constraints.maxWidth * .25),
               backgroundColor: Colors.cyan,
               child: Column(children: [
-                Expanded(child: OptionsPage(client,isDialog: true,headerHeight: 48)),
+                Expanded(child: OptionsPage(client,scope: scope,isDialog: true,headerHeight: 48)),
                 SimpleDialogOption(
                   onPressed: () => Navigator.pop(context),
                   child: const Text("Cancel",style: TextStyle(backgroundColor: Colors.white)),

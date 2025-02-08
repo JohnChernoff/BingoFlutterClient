@@ -2,6 +2,7 @@ import 'package:bingo_client/game_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart' hide Color;
 import 'package:zug_utils/zug_utils.dart';
+import 'package:zugclient/options_page.dart';
 import 'package:zugclient/zug_fields.dart';
 import 'dialogs.dart';
 import 'game.dart';
@@ -89,7 +90,7 @@ class BingoBoardWidget2 extends StatelessWidget {
             width: optBoxWidth,
             height: optBoxHeight,
             child: TextButton(
-                onPressed: () => client.fetchOptions(() => OptionDialog(client,context).raise()),
+                onPressed: () => client.fetchOptions(() => OptionDialog(client,context,OptionScope.area).raise()),
                 child: const FittedBox(child: Text("options", style: TextStyle(fontWeight: FontWeight.bold),)), //const Icon(Icons.menu),
                 //visualDensity: VisualDensity.compact,
             )
