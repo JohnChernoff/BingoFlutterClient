@@ -36,7 +36,7 @@ class GameClient extends ZugClient {
   bool helpMode = false;
   Game get currentGame => currentArea as Game;
 
-  GameClient(super.domain, super.port, super.remoteEndpoint, super.prefs, {super.localServer}) { showServMess = true;
+  GameClient(super.domain, super.port, super.remoteEndpoint, super.prefs, {super.localServer}) { //showServMess = true;
     clientName = "BingoClient";
     addFunctions({
       ServMsg.updateServ : handleUpdateServ,
@@ -65,8 +65,9 @@ class GameClient extends ZugClient {
     TopDialog(zugAppNavigatorKey.currentContext!,data["users"] as List<dynamic>).raise();
   }
 
-  void handleFeatured(data) { //TODO: null checks
+  void handleFeatured(data) { //print("Feat: $data");
       tvGame = TvGame(data["fen"],data["bName"],data["bTitle"], data["bRating"], data["bClock"], data["wName"], data["wTitle"], data["wRating"], data["wClock"]);
+      Game.fen = data["fen"];
   }
 
   @override

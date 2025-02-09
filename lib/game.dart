@@ -23,7 +23,7 @@ enum GamePhase{pregame,running,finished,unknown}
 enum GameSide{white,black}
 class Game extends Area {
 
-  static String? fen;
+  static String? fen; //TODO: why is this not in TVGame
   GamePhase phase = GamePhase.unknown;
   int? ante,pot, instapot;
   List<BingoBoard> boards = [];
