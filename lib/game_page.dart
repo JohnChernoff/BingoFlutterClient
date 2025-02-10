@@ -145,14 +145,14 @@ class _GamePageState extends State<GamePage> {
     ])));
   }
 
-  Widget getInfoWidget() {
+  Widget getInfoWidget(double height) {
     if (widget.client.currentGame.phase != GamePhase.unknown) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          getTextBox("Ante: ${widget.client.currentGame.ante} ",Colors.redAccent),
-          getTextBox("Pot: ${widget.client.currentGame.pot} ",Colors.greenAccent),
-          getTextBox("Insta-Pot: ${widget.client.currentGame.instapot} ",Colors.blueAccent),
+          getTextBox(height: height,"Ante: ${widget.client.currentGame.ante} ",Colors.redAccent),
+          getTextBox(height: height,"Pot: ${widget.client.currentGame.pot} ",Colors.greenAccent),
+          getTextBox(height: height,"Insta-Pot: ${widget.client.currentGame.instapot} ",Colors.blueAccent),
         ]
       );
     }
@@ -198,33 +198,52 @@ class _GamePageState extends State<GamePage> {
   Widget getLandscapeLayout(BingoBoard? userBoard,List<BingoBoard> otherBoards,BoxConstraints constraints) {
     bool isRunning = widget.client.currentGame.phase == GamePhase.running;
     Color borderColor = isRunning ? Colors.white : Colors.brown;
-    double headerHeight = 128;
-    double boardSize = min(constraints.maxWidth / 4,constraints.maxHeight * .8);
-    double upperHeight = boardSize + headerHeight;
+    double headerHeight = min(48,constraints.maxHeight * .1);
+    double boardSize = constraints.maxHeight * .8;
+    double tvSize = constraints.maxHeight/2;
+    double upperHeight = tvSize;
     double bottomHeight = constraints.maxHeight - upperHeight;
 
-    return Row( //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Expanded(child: (userBoard == null)
-              ? Image(image: ZugUtils.getAssetImage("images/bingo_bkg_land.png"), fit: BoxFit.fill,)
-              : Column(
-                  children: [
-                    widget.client.helpMode ? getHelpWrapper(getInfoWidget(), HelpArea.info) : getInfoWidget(),
-                    const SizedBox(height: 16),
-                    getMainBoardsWidget(userBoard, boardSize, borderColor, Axis.horizontal),
-                    widget.client.helpMode
-                        ? getHelpWrapper(getOtherBoardsWidget(otherBoards, bottomHeight, borderColor, Axis.horizontal),
-                        HelpArea.otherBoard)
-                        : getOtherBoardsWidget(otherBoards, bottomHeight, borderColor, Axis.horizontal),
-                  ]),
-            ),
-          BingoLobby(widget.client,
-              style: LobbyStyle.tersePort,
-              width: 320,
-              buttonsBkgCol: Colors.black,
-              areaFlex: 1,
-              chatArea: ZugChat(widget.client, width: 320, defScope: MessageScope.server))
-      ]);
+    Widget bbw = userBoard != null ? BingoBoardWidget2(
+        widget.client,widget.client.currentGame,userBoard,selectedSquare,boardSize
+    ) : const SizedBox.shrink();
+
+    Widget tv = widget.client.currentGame != widget.client.noArea
+        ? getTvBoard(tvSize)
+        : const SizedBox.shrink();
+
+    Widget userBoardArea =  widget.client.helpMode ? getHelpWrapper(bbw, HelpArea.mainBoard) : bbw;
+
+    Widget tvArea = widget.client.helpMode ? getHelpWrapper(tv, HelpArea.tv) : tv;
+
+    Widget infoArea = widget.client.helpMode ? getHelpWrapper(getInfoWidget(headerHeight), HelpArea.info) : getInfoWidget(headerHeight);
+
+    Widget lobbyArea = BingoLobby(widget.client,
+        style: LobbyStyle.tersePort,
+        width: 320,
+        buttonsBkgCol: Colors.black,
+        chatArea: ZugChat(widget.client, width: 320, defScope: MessageScope.server));
+
+    Widget otherBoardsArea = widget.client.helpMode
+        ? getHelpWrapper(getOtherBoardsWidget(otherBoards, bottomHeight, borderColor, Axis.horizontal),
+        HelpArea.otherBoard)
+        : getOtherBoardsWidget(otherBoards, bottomHeight, borderColor, Axis.horizontal);
+
+    Image bkgImg =  Image(image: ZugUtils.getAssetImage("images/bingo_bkg_land.png"), fit: BoxFit.fill);
+
+    return (userBoard == null)
+        ? Row(children: [Expanded(child: bkgImg), lobbyArea])
+        : Row(children: [
+          Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+            infoArea,
+            userBoardArea
+          ]),
+          Expanded(child: Column(children: [
+            tvArea,
+            otherBoardsArea
+          ])),
+          lobbyArea
+        ]);
   }
 
   Widget getPortraitLayout(BingoBoard? userBoard,List<BingoBoard> otherBoards,BoxConstraints constraints) {
@@ -235,7 +254,7 @@ class _GamePageState extends State<GamePage> {
     return SingleChildScrollView(child: Column(
       children: [
         const SizedBox(height: 16),
-        getInfoWidget(),
+        getInfoWidget(128),
         const SizedBox(height: 16),
         getMainBoardsWidget(userBoard, boardSize, borderColor, Axis.vertical),
         const SizedBox(height: 16),
@@ -247,7 +266,6 @@ class _GamePageState extends State<GamePage> {
               style: LobbyStyle.tersePort,
               width: constraints.maxWidth,
               buttonsBkgCol: Colors.black,
-              areaFlex: 1,
               chatArea: ZugChat(widget.client, width: constraints.maxWidth, defScope: MessageScope.server)),
         )
       ],

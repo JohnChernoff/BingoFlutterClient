@@ -66,8 +66,13 @@ class GameClient extends ZugClient {
   }
 
   void handleFeatured(data) { //print("Feat: $data");
+    try {
       tvGame = TvGame(data["fen"],data["bName"],data["bTitle"], data["bRating"], data["bClock"], data["wName"], data["wTitle"], data["wRating"], data["wClock"]);
       Game.fen = data["fen"];
+    }
+    catch (e) {
+      ZugClient.log.info("Feature Error: $data, $e");
+    }
   }
 
   @override

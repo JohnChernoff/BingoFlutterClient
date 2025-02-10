@@ -45,9 +45,9 @@ class BingoBoardWidget2 extends StatelessWidget {
     bool instaPress = game.phase == GamePhase.running && (player != null && player["instatry"] == true);
 
     List<Widget> stack = [
-      game.phase == GamePhase.finished
-          ? Image(image: ZugUtils.getAssetImage("images/bingo_board_fin.png"))
-          : Image(image: ZugUtils.getAssetImage("images/bingo_board.png")),
+      SizedBox(width: size, height: size, child: game.phase == GamePhase.finished
+          ? Image(image: ZugUtils.getAssetImage("images/bingo_board_fin.png"),fit: BoxFit.fill)
+          : Image(image: ZugUtils.getAssetImage("images/bingo_board.png"),fit: BoxFit.fill)),
       Positioned(
           left: instaBoxOff.dx,
           top: instaBoxOff.dy,

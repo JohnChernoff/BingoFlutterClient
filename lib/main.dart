@@ -62,7 +62,6 @@ class BingoLobby extends LobbyPage {
     super.width,
     super.borderWidth  = 1,
     super.borderCol = Colors.white,
-    super.areaFlex  = 3,
     super.key, super.chatArea});
 
   @override
@@ -94,7 +93,7 @@ class BingoLobby extends LobbyPage {
       ElevatedButton(
           style: getButtonStyle(Colors.blue, Colors.greenAccent),
           onPressed: () => OptionDialog(client as GameClient,context,OptionScope.general).raise(),
-          child: Text("options", style: getButtonTextStyle())
+          child: Text("Settings", style: getButtonTextStyle())
       ),
       ElevatedButton(
           style: getButtonStyle(Colors.green, Colors.redAccent),
