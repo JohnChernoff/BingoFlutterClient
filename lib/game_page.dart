@@ -10,9 +10,9 @@ import 'package:zugclient/zug_client.dart';
 import 'package:zugclient/zug_fields.dart';
 import 'bingo_board_widget.dart';
 import 'bingo_board_widget2.dart';
+import 'bingo_lobby.dart';
 import 'game.dart';
 import 'game_client.dart';
-import 'main.dart';
 
 class GamePage extends StatefulWidget {
   static TextStyle txtStyle = const TextStyle(color: Colors.white);

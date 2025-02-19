@@ -1,7 +1,8 @@
+import 'package:zugclient/dialogs.dart';
 import 'package:zugclient/zug_app.dart';
+import 'dialogs.dart';
 import 'package:zugclient/zug_client.dart';
 import 'package:zugclient/zug_fields.dart';
-import 'dialogs.dart';
 import 'game.dart';
 
 enum GameMsg { phase, gameWin, gameLose, top, instaBingo, rob, newFeatured, fetchFeatured }
@@ -47,6 +48,24 @@ class GameClient extends ZugClient {
     checkRedirect("lichess.org");
   }
 
+  @override
+  void connected() {
+    super.connected();
+    IntroDialog("Bingo Chess",zugAppNavigatorKey.currentContext!).raise().then((play) {
+      if (play ?? false) {
+        editOption(AudioOpt.music, true);
+        playTrack("bingo_intro.mp3");
+      }
+    });
+  }
+
+  @override
+  Future<bool> loggedIn(data) async {
+    bool logOK = await super.loggedIn(data);
+    if (logOK) startShuffle(initialTrack: 1);
+    return logOK;
+  }
+
   void handleUpdateServ(data) {
     ZugClient.log.info("Serv: $data");
   }
@@ -62,7 +81,10 @@ class GameClient extends ZugClient {
   }
 
   void handleTop(data) {
-    TopDialog(zugAppNavigatorKey.currentContext!,data["users"] as List<dynamic>).raise();
+    playTrack("bingo_high_score.mp3");
+    TopDialog(zugAppNavigatorKey.currentContext!,data["users"] as List<dynamic>).raise().then((onValue) {
+      startShuffle();
+    });
   }
 
   void handleFeatured(data) { //print("Feat: $data");
