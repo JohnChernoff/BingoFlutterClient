@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:zugclient/dialogs.dart';
 import 'package:zugclient/zug_app.dart';
 import 'dialogs.dart';
@@ -5,7 +6,7 @@ import 'package:zugclient/zug_client.dart';
 import 'package:zugclient/zug_fields.dart';
 import 'game.dart';
 
-enum GameMsg { phase, gameWin, gameLose, top, instaBingo, rob, newFeatured, fetchFeatured }
+enum GameMsg { phase, gameWin, gameLose, top, instaBingo, rob, newFeatured, fetchFeatured, goodCheck, badCheck, victory, defeat }
 
 class TvGame {
   final String initFen;
@@ -36,6 +37,11 @@ class GameClient extends ZugClient {
   TvGame? tvGame;
   bool helpMode = false;
   Game get currentGame => currentArea as Game;
+  AssetSource coolClip = AssetSource("audio/clips/cool.mp3");
+  AssetSource defeatClip = AssetSource("audio/clips/defeat.mp3");
+  AssetSource victoryClip = AssetSource("audio/clips/victory.mp3");
+  AssetSource dingClip = AssetSource("audio/clips/ding.mp3");
+  AssetSource doinkClip = AssetSource("audio/clips/doink.mp3");
 
   GameClient(super.domain, super.port, super.remoteEndpoint, super.prefs, {super.localServer}) { //showServMess = true;
     clientName = "BingoClient";
@@ -44,6 +50,10 @@ class GameClient extends ZugClient {
       GameMsg.top : handleTop,
       GameMsg.phase : handlePhase,
       GameMsg.newFeatured : handleFeatured,
+      GameMsg.goodCheck : handleGoodCheck,
+      GameMsg.badCheck : handleBadCheck,
+      GameMsg.victory : handleVictory,
+      GameMsg.defeat : handleDefeat,
     });
     checkRedirect("lichess.org");
   }
@@ -54,7 +64,7 @@ class GameClient extends ZugClient {
     IntroDialog("Bingo Chess",zugAppNavigatorKey.currentContext!).raise().then((play) {
       if (play ?? false) {
         editOption(AudioOpt.music, true);
-        playTrack("bingo_victory.mp3"); //bingo_intro.mp3");
+        playAudio(AssetSource("audio/tracks/bingo_intro.mp3")); //bingo_intro.mp3");
       }
     });
   }
@@ -75,16 +85,29 @@ class GameClient extends ZugClient {
     notifyListeners();
   }
 
+  @override
+  bool handleUpdateOptions(data, {Area? area}) {
+    bool b = super.handleUpdateOptions(data);
+    return b;
+  }
+
+  @override
+  bool handleUpdateArea(data) {
+    tvGame?.bClock = data["bClock"];
+    tvGame?.wClock = data["wClock"];
+    return super.handleUpdateArea(data); //getOrCreateArea(data).updateArea(data);
+  }
+
   void handlePhase(data) { //print("New Phase: $data");
     Area area = getOrCreateArea(data);
     if (area is Game) {
       area.setPhase(data["phase"]);
-      if (data["phase"] == "running") playTrack("game_start.mp3");
+      if (data["phase"] == "running") playAudio(AssetSource("audio/tracks/game_start.mp3"));
     }
   }
 
   void handleTop(data) {
-    playTrack("bingo_high_score.mp3");
+    playAudio(AssetSource("audio/tracks/bingo_high_score.mp3"));
     TopDialog(zugAppNavigatorKey.currentContext!,data["users"] as List<dynamic>).raise().then((onValue) {
       startShuffle();
     });
@@ -100,17 +123,23 @@ class GameClient extends ZugClient {
     }
   }
 
-  @override
-  bool handleUpdateOptions(data, {Area? area}) {
-    bool b = super.handleUpdateOptions(data);
-    return b;
+  void handleGoodCheck(data) { //print("Playing Good Check");
+    playAudio(dingClip,clip: true, pauseCurrentTrack: false); //.then((onValue) => print("Finished playing Good Check"));
   }
 
-  @override
-  bool handleUpdateArea(data) {
-    tvGame?.bClock = data["bClock"];
-    tvGame?.wClock = data["wClock"];
-    return super.handleUpdateArea(data); //getOrCreateArea(data).updateArea(data);
+  void handleBadCheck(data) {
+    playAudio(doinkClip,clip: true, pauseCurrentTrack: false);
+  }
+
+  void handleVictory(data) {
+    playAudio(coolClip,clip: true).then((onValue) { //print("Next...");
+      playAudio(victoryClip, clip: true).then((onData) { //print("finished clips");
+      });
+    });
+  }
+
+  void handleDefeat(data) {
+    playAudio(defeatClip,clip: true,pauseCurrentTrack: false);
   }
 
   @override

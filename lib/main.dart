@@ -46,10 +46,10 @@ class GameApp extends ZugApp {
   }
 
   @override
-  Widget createMainPage(client) => GamePage(client);
+  Widget createMainPage(ZugClient client) => GamePage(client as GameClient);
 
   @override
-  Widget createLobbyPage(client) => BingoLobby(client);
+  Widget createLobbyPage(ZugClient client) => BingoLobby(client);
 
 }
 
