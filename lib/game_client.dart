@@ -54,7 +54,7 @@ class GameClient extends ZugClient {
     IntroDialog("Bingo Chess",zugAppNavigatorKey.currentContext!).raise().then((play) {
       if (play ?? false) {
         editOption(AudioOpt.music, true);
-        playTrack("bingo_intro.mp3");
+        playTrack("bingo_victory.mp3"); //bingo_intro.mp3");
       }
     });
   }
@@ -77,7 +77,10 @@ class GameClient extends ZugClient {
 
   void handlePhase(data) { //print("New Phase: $data");
     Area area = getOrCreateArea(data);
-    if (area is Game) area.setPhase(data["phase"]);
+    if (area is Game) {
+      area.setPhase(data["phase"]);
+      if (data["phase"] == "running") playTrack("game_start.mp3");
+    }
   }
 
   void handleTop(data) {
