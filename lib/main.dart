@@ -40,7 +40,7 @@ class GameApp extends ZugApp {
     return AppBar(
       backgroundColor: Colors.black,
       title: Text(
-          "Welcome to $appName, ${client.userName?.name ?? "Unknown User"}! ",
+          "Welcome to $appName ${client.packageInfo?.version ?? '0.?'}, ${client.userName?.name ?? "Unknown User"}",
           style: const TextStyle(color: Colors.white)),
     );
   }

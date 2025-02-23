@@ -124,22 +124,30 @@ class GameClient extends ZugClient {
   }
 
   void handleGoodCheck(data) { //print("Playing Good Check");
-    playAudio(dingClip,clip: true, pauseCurrentTrack: false); //.then((onValue) => print("Finished playing Good Check"));
+    if (currentArea == getOrCreateArea(data)) {
+      playAudio(dingClip,clip: true, pauseCurrentTrack: false);
+    }
   }
 
-  void handleBadCheck(data) {
-    playAudio(doinkClip,clip: true, pauseCurrentTrack: false);
+  void handleBadCheck(data) { //print("Playing Bad Check");
+    if (currentArea == getOrCreateArea(data)) {
+      playAudio(doinkClip, clip: true, pauseCurrentTrack: false);
+    }
   }
 
   void handleVictory(data) {
-    playAudio(coolClip,clip: true).then((onValue) { //print("Next...");
-      playAudio(victoryClip, clip: true).then((onData) { //print("finished clips");
+    if (currentArea == getOrCreateArea(data)) {
+      playAudio(coolClip,clip: true).then((onValue) { //print("Next...");
+        playAudio(victoryClip, clip: true).then((onData) { //print("finished clips");
+        });
       });
-    });
+    }
   }
 
   void handleDefeat(data) {
-    playAudio(defeatClip,clip: true,pauseCurrentTrack: false);
+    if (currentArea == getOrCreateArea(data)) {
+      playAudio(defeatClip,clip: true,pauseCurrentTrack: false);
+    }
   }
 
   @override
