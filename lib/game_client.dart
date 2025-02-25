@@ -1,42 +1,19 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:zug_utils/zug_dialogs.dart';
 import 'package:zugclient/dialogs.dart';
 import 'package:zugclient/zug_app.dart';
+import 'bingo_fields.dart';
+import 'chess_game.dart';
 import 'dialogs.dart';
 import 'package:zugclient/zug_client.dart';
 import 'package:zugclient/zug_fields.dart';
-import 'game.dart';
-
-enum GameMsg { phase, gameWin, gameLose, top, instaBingo, rob, newFeatured, fetchFeatured, goodCheck, badCheck, victory, defeat }
-
-class TvGame {
-  final String initFen;
-  final String wName, bName, wTitle, bTitle;
-  final int wRating, bRating;
-  int wClock, bClock;
-
-  TvGame(this.initFen,this.bName, this.bTitle, this.bRating, this.bClock, this.wName, this.wTitle, this.wRating, this.wClock);
-
-  String formatDuration(int totalSeconds) {
-    final duration = Duration(seconds: totalSeconds);
-    final minutes = duration.inMinutes;
-    final seconds = totalSeconds % 60;
-
-    final minutesString = '$minutes'.padLeft(2, '0');
-    final secondsString = '$seconds'.padLeft(2, '0');
-    return '$minutesString:$secondsString';
-  }
-
-  String getPlayerString(GameSide turn) {
-    if (turn == GameSide.white) return "$wTitle $wName ($wRating) : ${formatDuration(wClock)}";
-    return "$bTitle $bName ($bRating) : ${formatDuration(bClock)}";
-  }
-}
+import 'bingo_game.dart';
 
 class GameClient extends ZugClient {
 
-  TvGame? tvGame;
+  ChessGame chessGame = ChessGame();
   bool helpMode = false;
-  Game get currentGame => currentArea as Game;
+  BingoGame get currentGame => currentArea as BingoGame;
   AssetSource coolClip = AssetSource("audio/clips/cool.mp3");
   AssetSource defeatClip = AssetSource("audio/clips/defeat.mp3");
   AssetSource victoryClip = AssetSource("audio/clips/victory.mp3");
@@ -54,6 +31,8 @@ class GameClient extends ZugClient {
       GameMsg.badCheck : handleBadCheck,
       GameMsg.victory : handleVictory,
       GameMsg.defeat : handleDefeat,
+      GameMsg.newMove : handleNewMove,
+      GameMsg.errNotTurn : handleErrTurn,
     });
     checkRedirect("lichess.org");
   }
@@ -92,17 +71,16 @@ class GameClient extends ZugClient {
   }
 
   @override
-  bool handleUpdateArea(data) {
-    tvGame?.bClock = data["bClock"];
-    tvGame?.wClock = data["wClock"];
+  bool handleUpdateArea(data) { //print(data);
+    chessGame.update(data[BingoFields.game]);
     return super.handleUpdateArea(data); //getOrCreateArea(data).updateArea(data);
   }
 
   void handlePhase(data) { //print("New Phase: $data");
     Area area = getOrCreateArea(data);
-    if (area is Game) {
-      area.setPhase(data["phase"]);
-      if (data["phase"] == "running") playAudio(AssetSource("audio/tracks/game_start.mp3"));
+    if (area is BingoGame) {
+      area.setPhase(data[fieldPhase]); //TODO: enum phases
+      if (data[fieldPhase] == "running") playAudio(AssetSource("audio/tracks/game_start.mp3"));
     }
   }
 
@@ -114,13 +92,8 @@ class GameClient extends ZugClient {
   }
 
   void handleFeatured(data) { //print("Feat: $data");
-    try {
-      tvGame = TvGame(data["fen"],data["bName"],data["bTitle"], data["bRating"], data["bClock"], data["wName"], data["wTitle"], data["wRating"], data["wClock"]);
-      Game.fen = data["fen"];
-    }
-    catch (e) {
-      ZugClient.log.info("Feature Error: $data, $e");
-    }
+    try { chessGame = ChessGame.fromData(data); }
+    catch (e) { ZugClient.log.info("Feature Error: $data, $e"); }
   }
 
   void handleGoodCheck(data) { //print("Playing Good Check");
@@ -150,9 +123,19 @@ class GameClient extends ZugClient {
     }
   }
 
+  void handleErrTurn(data) {
+    ZugDialogs.popup("Not your turn!");
+  }
+
+  void handleNewMove(data) {
+    if (currentArea == getOrCreateArea(data)) {
+      addAreaMsg("New move: ${data[BingoFields.pan]}", currentArea.id);
+    }
+  }
+
   @override
   Area createArea(data) {
-    return Game(data);
+    return BingoGame(data);
   }
 
 }

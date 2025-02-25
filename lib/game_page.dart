@@ -10,8 +10,10 @@ import 'package:zugclient/zug_client.dart';
 import 'package:zugclient/zug_fields.dart';
 import 'bingo_board_widget.dart';
 import 'bingo_board_widget2.dart';
+import 'bingo_fields.dart';
 import 'bingo_lobby.dart';
-import 'game.dart';
+import 'chess_game.dart';
+import 'bingo_game.dart';
 import 'game_client.dart';
 
 class GamePage extends StatefulWidget {
@@ -28,13 +30,12 @@ class _GamePageState extends State<GamePage> {
   Offset? mouseOff;
   HelpArea helpArea = HelpArea.none;
   SquareCoord? selectedSquare;
-  ChessBoardController chessBoardController = ChessBoardController();
 
   @override
   void initState() {
     super.initState();
     widget.client.areaCmd(ClientMsg.setDeaf,data:{fieldDeafened:false});
-    widget.client.areaCmd(GameMsg.fetchFeatured);
+    widget.client.areaCmd(ClientMsg.updateArea); //GameMsg.fetchFeatured);
     countdown();
   }
 
@@ -42,7 +43,7 @@ class _GamePageState extends State<GamePage> {
   Widget build(BuildContext context) {
     BingoBoard? userBoard = widget.client.currentGame.getBoardByUser(widget.client.userName);
     List<BingoBoard> otherBoards = widget.client.currentGame.getOtherBoards(widget.client.userName);
-    chessBoardController.loadFen(Game.fen ?? widget.client.tvGame?.initFen ?? "8/8/8/8/8/8/8/8 w - - 0 1");
+    //chessBoardController.loadFen(widget.client.chessGame?. ?? "8/8/8/8/8/8/8/8 w - - 0 1");
 
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) =>
         ColoredBox(color: Colors.black, child: Stack(
@@ -64,14 +65,15 @@ class _GamePageState extends State<GamePage> {
   Future<void> countdown() async {
     while (mounted) {
       await Future.delayed(const Duration(seconds: 1));
+      ChessGame game = widget.client.chessGame;
       if (mounted) {
-        setState(() {
-          if (widget.client.currentGame.lastTurn == GameSide.black) {
-            widget.client.tvGame?.bClock--;
-          } else {
-            widget.client.tvGame?.wClock--;
-          }
-        });
+        int newTime = (game.playerClock[game.getTurn()] ?? 0) - 1;
+        if (newTime >= 0) {
+          setState(() {
+            widget.client.chessGame.playerClock
+                .update(game.getTurn(), (i) => newTime);
+          });
+        }
       }
     }
   }
@@ -123,21 +125,22 @@ class _GamePageState extends State<GamePage> {
         width: boardSize,
         height: boardSize,
         child: Center( child: Column(children: [
-      getTextBox("${widget.client.currentGame.lastTurn == GameSide.black ? "***" : ""} ${widget.client.tvGame?.getPlayerString(GameSide.black)}",
+      getTextBox("${widget.client.chessGame.getTurn() == GameSide.black ? "***" : ""} ${widget.client.chessGame.getPlayerString(GameSide.black)}",
           borderWidth: 0, //widget.client.currentGame.lastTurn == Turn.black ? 1 : 0,
           height: infoHeight,
           Colors.black,
           txtCol: Colors.white), //widget.client.currentGame.lastTurn == Turn.black ? Colors.green : Colors.white),
       ChessBoard(
-        controller: chessBoardController,
+        controller: widget.client.chessGame.controller,
         size: boardSize - ((infoHeight  + borderWidth) * 2),
         boardColor: BoardColor.darkBrown,
         blackPieceColor: Colors.white,
+        onMove: (from,to,prom) => widget.client.areaCmd(GameMsg.newMove,data: {BingoFields.move : "$from$to${prom ?? ''}"}),
         onSquareSelect: (sqr,selected) {
           if (selected) { setState(() { selectedSquare = sqr; }); }
         },
       ),
-      getTextBox("${widget.client.currentGame.lastTurn == GameSide.white ? "***" : ""} ${widget.client.tvGame?.getPlayerString(GameSide.white)}",
+      getTextBox("${widget.client.chessGame.getTurn() == GameSide.white ? "***" : ""} ${widget.client.chessGame.getPlayerString(GameSide.white)}",
           borderWidth: 0, //widget.client.currentGame.lastTurn == Turn.white ? 1 : 0,
           height: infoHeight,
           Colors.black,

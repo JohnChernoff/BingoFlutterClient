@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart' hide Color;
-import 'game.dart';
+import 'bingo_game.dart';
 import 'game_page.dart';
 
 class BingoBoardWidget extends StatelessWidget {

@@ -4,14 +4,15 @@ import 'package:flutter_chess_board/flutter_chess_board.dart' hide Color;
 import 'package:zug_utils/zug_utils.dart';
 import 'package:zugclient/options_page.dart';
 import 'package:zugclient/zug_fields.dart';
+import 'bingo_fields.dart';
 import 'dialogs.dart';
-import 'game.dart';
+import 'bingo_game.dart';
 
 class BingoBoardWidget2 extends StatelessWidget {
   final GameClient client;
   final double size;
   final BingoBoard board;
-  final Game game;
+  final BingoGame game;
   final SquareCoord? selectedSquare;
   final int bingColHex;
   final double imgWidth = 901;
@@ -125,9 +126,12 @@ class BingoBoardWidget2 extends StatelessWidget {
         ); // : const SizedBox.shrink();
     }
     ));
-    return SizedBox(width: size, height: size, child: Stack(
-      children: stack,
-    ));
+
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(children: stack)
+    );
   }
 
   ButtonStyle getInstaButtStyle(bool pressed) {

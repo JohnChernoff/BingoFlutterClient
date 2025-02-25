@@ -1,5 +1,6 @@
 import 'package:zugclient/zug_client.dart';
 import 'package:zugclient/zug_fields.dart';
+import 'bingo_fields.dart';
 import 'game_client.dart';
 
 class BingoBoard {
@@ -20,14 +21,13 @@ class BingoSquare {
 }
 
 enum GamePhase{pregame,running,finished,unknown}
-enum GameSide{white,black}
-class Game extends Area {
 
-  static String? fen; //TODO: why is this not in TVGame
+
+class BingoGame extends Area {
   GamePhase phase = GamePhase.unknown;
   int? ante,pot, instapot;
   List<BingoBoard> boards = [];
-  GameSide lastTurn = GameSide.white;
+  bool playing = false;
 
   void setPhase(dynamic p) => phase = switch(p as String) {
     "pregame" => GamePhase.pregame,
@@ -36,7 +36,7 @@ class Game extends Area {
     String() => GamePhase.unknown
   };
 
-  Game(super.data);
+  BingoGame(super.data);
 
   @override
   bool updateArea(Map<String,dynamic> data) {
@@ -45,31 +45,24 @@ class Game extends Area {
   }
 
   //TODO: create squareChanged() to reduce spam
-  void update(dynamic data,{ GameClient? client } ) { //print("data: $data");
+  void update(dynamic data,{ GameClient? client } ) { //print("game data: $data");
     boards.clear();
-    List<dynamic> boardList = data["boards"];
+    List<dynamic> boardList = data[BingoFields.boards];
     for (dynamic boardData in boardList) {
       List<BingoSquare> sqrList = [];
-      List<dynamic> squareList = boardData["squares"];
+      List<dynamic> squareList = boardData[BingoFields.squares];
       for (dynamic square in squareList) {
         sqrList.add(BingoSquare(
-          square["square"],
-          square["checked"],
+          square[BingoFields.square],
+          square[BingoFields.checked],
         ));
       }
-      boards.add(BingoBoard(UniqueName.fromData(boardData[fieldUser]), sqrList,data["dim"]));
-      setPhase(data["phase"]);
-      ante = data["ante"];
-      pot = data["pot"];
-      instapot = data["instapot"];
-      fen = data["fen"];
-      List<String> fenFields = fen!.split(" ");
-      if (fenFields.length > 1) {
-        lastTurn = fenFields.elementAt(1) == "w" ? GameSide.white : GameSide.black;
-      }
-      else {
-        lastTurn = lastTurn == GameSide.white ? GameSide.black : GameSide.white;
-      }
+      setPhase(data[fieldPhase]);
+      boards.add(BingoBoard(UniqueName.fromData(boardData[fieldUser]), sqrList,data[BingoFields.boardSize]));
+      ante = data[BingoFields.ante];
+      pot = data[BingoFields.pot];
+      instapot = data[BingoFields.instaPot];
+      playing = data[BingoFields.playingGame];
     }
   }
 

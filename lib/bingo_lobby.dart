@@ -4,6 +4,7 @@ import 'package:zugclient/lobby_page.dart';
 import 'package:zugclient/options_page.dart';
 import 'package:zugclient/zug_client.dart';
 
+import 'bingo_fields.dart';
 import 'dialogs.dart';
 import 'game_client.dart';
 

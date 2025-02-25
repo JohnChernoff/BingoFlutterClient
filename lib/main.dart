@@ -1,18 +1,35 @@
 import 'dart:developer';
-import 'package:bingo_client/dialogs.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 import 'package:zug_utils/zug_utils.dart';
-import 'package:zugclient/lobby_page.dart';
-import 'package:zugclient/options_page.dart';
 import 'package:zugclient/zug_app.dart';
 import 'package:zugclient/zug_client.dart';
-import 'package:zugclient/zug_fields.dart';
 import 'bingo_lobby.dart';
 import 'game_client.dart';
 import 'game_page.dart';
+
+/*
+ Maybe something to share your win on various social media.
+ Clearer "Select Game" dropdown?
+ InstaBingo sounds
+
+ TV should always be on
+
+ chess logic?!
+
+ autogenerate "interesting" board names
+
+ quicker autoclose/removal of finished boards (filter out from list?)
+
+ responsive(er) layout, especially when square screen
+
+ more help (videos, etc.)
+
+ see other player boards
+
+ persistent (and richer) chat
+ */
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
