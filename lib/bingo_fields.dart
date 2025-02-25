@@ -1,4 +1,4 @@
-enum GameMsg { phase, gameWin, gameLose, top, instaBingo, rob, newFeatured, fetchFeatured, goodCheck, badCheck, victory, defeat, newMove, errNotTurn }
+enum GameMsg { phase, gameWin, gameLose, top, instaBingo, rob, newFeatured, fetchFeatured, goodCheck, badCheck, victory, defeat, newMove, errNotTurn, updateChessGame }
 
 class BingoFields {
   static String id = "id";

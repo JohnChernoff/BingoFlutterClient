@@ -33,6 +33,7 @@ class GameClient extends ZugClient {
       GameMsg.defeat : handleDefeat,
       GameMsg.newMove : handleNewMove,
       GameMsg.errNotTurn : handleErrTurn,
+      GameMsg.updateChessGame : handleUpdateChessGame,
     });
     checkRedirect("lichess.org");
   }
@@ -43,7 +44,7 @@ class GameClient extends ZugClient {
     IntroDialog("Bingo Chess",zugAppNavigatorKey.currentContext!).raise().then((play) {
       if (play ?? false) {
         editOption(AudioOpt.music, true);
-        playAudio(AssetSource("audio/tracks/bingo_intro.mp3")); //bingo_intro.mp3");
+        playAudio(AssetSource("audio/tracks/bingo_intro.mp3"));
       }
     });
   }
@@ -72,8 +73,13 @@ class GameClient extends ZugClient {
 
   @override
   bool handleUpdateArea(data) { //print(data);
-    chessGame.update(data[BingoFields.game]);
-    return super.handleUpdateArea(data); //getOrCreateArea(data).updateArea(data);
+    handleUpdateChessGame(data);
+    super.handleUpdateArea(data);
+    return true;
+  }
+
+  void handleUpdateChessGame(data) {
+    if (data[fieldPhase] != "finished") chessGame.update(data[BingoFields.game]);
   }
 
   void handlePhase(data) { //print("New Phase: $data");
@@ -91,7 +97,7 @@ class GameClient extends ZugClient {
     });
   }
 
-  void handleFeatured(data) { //print("Feat: $data");
+  void handleFeatured(data) { print("Feat: $data");
     try { chessGame = ChessGame.fromData(data); }
     catch (e) { ZugClient.log.info("Feature Error: $data, $e"); }
   }

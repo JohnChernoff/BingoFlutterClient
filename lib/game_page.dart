@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:bingo_client/help_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_chess_board/flutter_chess_board.dart' hide Color;
+import 'package:flutter_chess_board/flutter_chess_board.dart' as cb;
 import 'package:zug_utils/zug_utils.dart';
 import 'package:zugclient/lobby_page.dart';
 import 'package:zugclient/zug_chat.dart';
@@ -29,7 +29,7 @@ class GamePage extends StatefulWidget {
 class _GamePageState extends State<GamePage> {
   Offset? mouseOff;
   HelpArea helpArea = HelpArea.none;
-  SquareCoord? selectedSquare;
+  cb.SquareCoord? selectedSquare;
 
   @override
   void initState() {
@@ -118,6 +118,9 @@ class _GamePageState extends State<GamePage> {
   }
 
   Widget getTvBoard(double boardSize, {double infoHeight = 24, double borderWidth = 0}) {
+    cb.PlayerColor bottomColor = widget.client.chessGame.getOrientation(widget.client.userName);
+    cb.PlayerColor topColor = bottomColor == cb.PlayerColor.white ? cb.PlayerColor.black : cb.PlayerColor.white;
+
     return Container(
         decoration: BoxDecoration(
           border: (borderWidth > 0) ? Border.all(color: Colors.white,width: borderWidth) : null,
@@ -125,22 +128,23 @@ class _GamePageState extends State<GamePage> {
         width: boardSize,
         height: boardSize,
         child: Center( child: Column(children: [
-      getTextBox("${widget.client.chessGame.getTurn() == GameSide.black ? "***" : ""} ${widget.client.chessGame.getPlayerString(GameSide.black)}",
+      getTextBox("${widget.client.chessGame.getTurn() == topColor ? "***" : ""} ${widget.client.chessGame.getPlayerString(topColor)}",
           borderWidth: 0, //widget.client.currentGame.lastTurn == Turn.black ? 1 : 0,
           height: infoHeight,
           Colors.black,
           txtCol: Colors.white), //widget.client.currentGame.lastTurn == Turn.black ? Colors.green : Colors.white),
-      ChessBoard(
+      cb.ChessBoard(
         controller: widget.client.chessGame.controller,
+        boardOrientation: bottomColor,
         size: boardSize - ((infoHeight  + borderWidth) * 2),
-        boardColor: BoardColor.darkBrown,
+        boardColor: cb.BoardColor.darkBrown,
         blackPieceColor: Colors.white,
         onMove: (from,to,prom) => widget.client.areaCmd(GameMsg.newMove,data: {BingoFields.move : "$from$to${prom ?? ''}"}),
         onSquareSelect: (sqr,selected) {
           if (selected) { setState(() { selectedSquare = sqr; }); }
         },
       ),
-      getTextBox("${widget.client.chessGame.getTurn() == GameSide.white ? "***" : ""} ${widget.client.chessGame.getPlayerString(GameSide.white)}",
+      getTextBox("${widget.client.chessGame.getTurn() == bottomColor ? "***" : ""} ${widget.client.chessGame.getPlayerString(bottomColor)}",
           borderWidth: 0, //widget.client.currentGame.lastTurn == Turn.white ? 1 : 0,
           height: infoHeight,
           Colors.black,
