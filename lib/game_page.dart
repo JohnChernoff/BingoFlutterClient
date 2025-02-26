@@ -73,12 +73,12 @@ class _GamePageState extends State<GamePage> {
   Future<void> countdown() async {
     while (mounted) {
       await Future.delayed(const Duration(seconds: 1));
-      ChessGame game = widget.client.chessGame;
+      ChessGame game = widget.client.currentGame.chessGame;
       if (mounted) {
         int newTime = (game.playerClock[game.getTurn()] ?? 0) - 1;
         if (newTime >= 0) {
           setState(() {
-            widget.client.chessGame.playerClock
+            widget.client.currentGame.chessGame.playerClock
                 .update(game.getTurn(), (i) => newTime);
           });
         }
@@ -126,7 +126,7 @@ class _GamePageState extends State<GamePage> {
   }
 
   Widget getTvBoard(double boardSize, {double infoHeight = 24, double borderWidth = 0}) {
-    cb.PlayerColor bottomColor = widget.client.chessGame.getOrientation(widget.client.userName);
+    cb.PlayerColor bottomColor = widget.client.currentGame.chessGame.getOrientation(widget.client.userName);
     cb.PlayerColor topColor = bottomColor == cb.PlayerColor.white ? cb.PlayerColor.black : cb.PlayerColor.white;
 
     return Container(
@@ -136,13 +136,13 @@ class _GamePageState extends State<GamePage> {
         width: boardSize,
         height: boardSize,
         child: Center( child: Column(children: [
-      getTextBox("${widget.client.chessGame.getTurn() == topColor ? "***" : ""} ${widget.client.chessGame.getPlayerString(topColor)}",
+      getTextBox("${widget.client.currentGame.chessGame.getTurn() == topColor ? "***" : ""} ${widget.client.currentGame.chessGame.getPlayerString(topColor)}",
           borderWidth: 0, //widget.client.currentGame.lastTurn == Turn.black ? 1 : 0,
           height: infoHeight,
           Colors.black,
           txtCol: Colors.white), //widget.client.currentGame.lastTurn == Turn.black ? Colors.green : Colors.white),
       cb.ChessBoard(
-        controller: widget.client.chessGame.controller,
+        controller: widget.client.currentGame.chessGame.controller,
         boardOrientation: bottomColor,
         size: boardSize - ((infoHeight  + borderWidth) * 2),
         boardColor: cb.BoardColor.darkBrown,
@@ -152,7 +152,7 @@ class _GamePageState extends State<GamePage> {
           if (selected) { setState(() { selectedSquare = sqr; }); }
         },
       ),
-      getTextBox("${widget.client.chessGame.getTurn() == bottomColor ? "***" : ""} ${widget.client.chessGame.getPlayerString(bottomColor)}",
+      getTextBox("${widget.client.currentGame.chessGame.getTurn() == bottomColor ? "***" : ""} ${widget.client.currentGame.chessGame.getPlayerString(bottomColor)}",
           borderWidth: 0, //widget.client.currentGame.lastTurn == Turn.white ? 1 : 0,
           height: infoHeight,
           Colors.black,

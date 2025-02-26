@@ -1,7 +1,7 @@
-import 'package:flutter_chess_board/flutter_chess_board.dart';
 import 'package:zugclient/zug_client.dart';
 import 'package:zugclient/zug_fields.dart';
 import 'bingo_fields.dart';
+import 'chess_game.dart';
 import 'game_client.dart';
 
 class BingoBoard {
@@ -26,6 +26,7 @@ enum GamePhase{pregame,running,finished,unknown}
 
 
 class BingoGame extends Area {
+  ChessGame chessGame = ChessGame();
   GamePhase phase = GamePhase.unknown;
   int? ante,pot, instapot;
   List<BingoBoard> boards = [];

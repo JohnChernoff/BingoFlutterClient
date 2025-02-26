@@ -11,7 +11,7 @@ import 'bingo_game.dart';
 
 class GameClient extends ZugClient {
 
-  ChessGame chessGame = ChessGame();
+
   bool helpMode = false;
   BingoGame get currentGame => currentArea as BingoGame;
   AssetSource coolClip = AssetSource("audio/clips/cool.mp3");
@@ -80,7 +80,7 @@ class GameClient extends ZugClient {
 
   void handleUpdateChessGame(data) {
     if (currentArea == getOrCreateArea(data) && data[fieldPhase] != "finished") {
-      chessGame.update(data[BingoFields.game]);
+      currentGame.chessGame.update(data[BingoFields.game]);
     }
 
   }
@@ -102,7 +102,7 @@ class GameClient extends ZugClient {
 
   void handleFeatured(data) {
     if (currentArea == getOrCreateArea(data)) { //print("Feat: $data");
-      try { chessGame = ChessGame.fromData(data); }
+      try { currentGame.chessGame = ChessGame.fromData(data); }
       catch (e) { ZugClient.log.info("Feature Error: $data, $e"); }
     }
   }
