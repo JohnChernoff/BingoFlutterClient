@@ -5,6 +5,7 @@ class BingoFields {
   static String boards = "boards";
   static String squares = "squares";
   static String square = "square";
+  static String pieceType = "pieceType";
   static String checked = "checked";
   static String boardSize = "dim";
   static String ante = "ante";

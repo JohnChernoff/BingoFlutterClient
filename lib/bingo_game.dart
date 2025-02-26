@@ -1,3 +1,4 @@
+import 'package:flutter_chess_board/flutter_chess_board.dart';
 import 'package:zugclient/zug_client.dart';
 import 'package:zugclient/zug_fields.dart';
 import 'bingo_fields.dart';
@@ -16,8 +17,9 @@ class BingoBoard {
 
 class BingoSquare {
   final int checked;
+  final String pieceType;
   final String chessSqr;
-  BingoSquare(this.chessSqr,this.checked);
+  BingoSquare(this.chessSqr,this.pieceType,this.checked);
 }
 
 enum GamePhase{pregame,running,finished,unknown}
@@ -53,7 +55,8 @@ class BingoGame extends Area {
       List<dynamic> squareList = boardData[BingoFields.squares];
       for (dynamic square in squareList) {
         sqrList.add(BingoSquare(
-          square[BingoFields.square],
+          square[BingoFields.square] == "NONE" ? "?" : square[BingoFields.square],
+          square[BingoFields.pieceType] == "NONE" ? "" : square[BingoFields.pieceType],
           square[BingoFields.checked],
         ));
       }

@@ -102,7 +102,7 @@ class BingoBoardWidget2 extends StatelessWidget {
         BingoSquare sqr = board.squares.elementAt(i);
         int row = i % board.dim;
         int col = (i / board.dim).truncate();
-        Widget boxTxt = Center(child: Text(sqr.chessSqr,style: TextStyle(
+        Widget boxTxt = Center(child: Text(sqr.pieceType + sqr.chessSqr,style: TextStyle(
             color: sqr.checked > 0 ? Colors.black : bingCol, fontWeight: FontWeight.bold)));
         return Positioned(
           left: offset.dx + ((sqrWidth + barWidth) * row),
