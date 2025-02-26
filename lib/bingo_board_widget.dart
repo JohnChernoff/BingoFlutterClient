@@ -51,7 +51,7 @@ class BingoBoardWidget extends StatelessWidget {
             ),
             width:  gridSize/board.dim,
             height: gridSize/board.dim,
-            child: Center(child: Text(cell.chessSqr,style: GamePage.txtStyle),
+            child: Center(child: Text(cell.pieceType + cell.chessSqr,style: GamePage.txtStyle),
             ),
           ));
         }),

@@ -41,25 +41,33 @@ class _GamePageState extends State<GamePage> {
 
   @override
   Widget build(BuildContext context) {
-    BingoBoard? userBoard = widget.client.currentGame.getBoardByUser(widget.client.userName);
-    List<BingoBoard> otherBoards = widget.client.currentGame.getOtherBoards(widget.client.userName);
-    //chessBoardController.loadFen(widget.client.chessGame?. ?? "8/8/8/8/8/8/8/8 w - - 0 1");
+    BingoBoard? userBoard =
+        widget.client.currentGame.getBoardByUser(widget.client.userName);
+    List<BingoBoard> otherBoards =
+        widget.client.currentGame.getOtherBoards(widget.client.userName);
 
-    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) =>
-        ColoredBox(color: Colors.black, child: Stack(
-          children: [
-            constraints.maxWidth > constraints.maxHeight
-                ? getLandscapeLayout(userBoard, otherBoards, constraints)
-                : getPortraitLayout(userBoard, otherBoards, constraints),
-            if (helpArea != HelpArea.none)
-              Positioned(
-                  left: mouseOff?.dx, width: constraints.maxWidth/4,
-                  top: mouseOff?.dy, height: constraints.maxHeight/4, //+ 127
-                  child: HelpWidget(helpArea)
-              ),
-          ],
-        )
-    ));
+    return ColoredBox(color: Colors.black, child: Center(
+        child: AspectRatio(
+            aspectRatio: MediaQuery.of(context).orientation == Orientation.landscape ? 2 : .5,
+            child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) =>  ColoredBox(
+                    color: Colors.black,
+                    child: Stack(
+                      children: [
+                        constraints.maxWidth > constraints.maxHeight
+                            ? getLandscapeLayout(
+                                userBoard, otherBoards, constraints)
+                            : getPortraitLayout(
+                                userBoard, otherBoards, constraints),
+                        if (helpArea != HelpArea.none)
+                          Positioned(
+                              left: mouseOff?.dx,
+                              width: constraints.maxWidth / 4,
+                              top: mouseOff?.dy,
+                              height: constraints.maxHeight / 4,
+                              child: HelpWidget(helpArea)),
+                      ],
+                    ))))));
   }
 
   Future<void> countdown() async {

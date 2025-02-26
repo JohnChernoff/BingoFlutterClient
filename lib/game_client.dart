@@ -79,7 +79,10 @@ class GameClient extends ZugClient {
   }
 
   void handleUpdateChessGame(data) {
-    if (data[fieldPhase] != "finished") chessGame.update(data[BingoFields.game]);
+    if (currentArea == getOrCreateArea(data) && data[fieldPhase] != "finished") {
+      chessGame.update(data[BingoFields.game]);
+    }
+
   }
 
   void handlePhase(data) { //print("New Phase: $data");
@@ -97,9 +100,11 @@ class GameClient extends ZugClient {
     });
   }
 
-  void handleFeatured(data) { print("Feat: $data");
-    try { chessGame = ChessGame.fromData(data); }
-    catch (e) { ZugClient.log.info("Feature Error: $data, $e"); }
+  void handleFeatured(data) {
+    if (currentArea == getOrCreateArea(data)) { //print("Feat: $data");
+      try { chessGame = ChessGame.fromData(data); }
+      catch (e) { ZugClient.log.info("Feature Error: $data, $e"); }
+    }
   }
 
   void handleGoodCheck(data) { //print("Playing Good Check");
