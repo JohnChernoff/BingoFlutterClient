@@ -75,6 +75,11 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  fonts:
+    - family: Chess
+      fonts:
+        - asset: assets/fonts/ChessAlpha2.ttf
+
   assets:
     - assets/txt/
     - assets/images/

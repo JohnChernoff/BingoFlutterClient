@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:zugclient/zug_client.dart';
 import 'package:zugclient/zug_fields.dart';
 import 'bingo_fields.dart';
@@ -19,11 +20,28 @@ class BingoSquare {
   final int checked;
   final String pieceType;
   final String chessSqr;
-  BingoSquare(this.chessSqr,this.pieceType,this.checked);
+  final Widget widget;
+
+  BingoSquare(this.chessSqr, this.pieceType, this.checked)
+      : widget = Text(
+          switch (pieceType) {
+                "P" => "I",
+                "N" => "K",
+                "B" => "J",
+                "R" => "L",
+                "Q" => "M",
+                "K" => "N",
+                String() => pieceType,
+              } +
+              chessSqr.toLowerCase(),
+          style: const TextStyle(
+            fontFamily: "Chess",
+            color: Colors.white,
+          ),
+        );
 }
 
 enum GamePhase{pregame,running,finished,unknown}
-
 
 class BingoGame extends Area {
   ChessGame chessGame = ChessGame();
