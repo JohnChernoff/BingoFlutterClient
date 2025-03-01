@@ -61,7 +61,7 @@ class ChessGame {
 
   String getPlayerString(PlayerColor turn) {
     String rat = (playerRating[turn] ?? 0) > 0 ? "(${playerRating[turn]})" : "";
-    return "${playerTitle[turn]} ${playerName[turn]} ($rat) : ${formatDuration(playerClock[turn] ?? 0)}";
+    return "${playerTitle[turn] ?? ""} ${playerName[turn] ?? ""} $rat ${formatDuration(playerClock[turn] ?? 0)}";
   }
 
   PlayerColor getOrientation(UniqueName? uName) {

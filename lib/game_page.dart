@@ -125,7 +125,7 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
-  Widget getTvBoard(double boardSize, {double infoHeight = 24, double borderWidth = 0}) {
+  Widget getChessBoard(double boardSize, {double infoHeight = 24, double borderWidth = 0}) {
     cb.PlayerColor bottomColor = widget.client.currentGame.chessGame.getOrientation(widget.client.userName);
     cb.PlayerColor topColor = bottomColor == cb.PlayerColor.white ? cb.PlayerColor.black : cb.PlayerColor.white;
 
@@ -147,7 +147,12 @@ class _GamePageState extends State<GamePage> {
         size: boardSize - ((infoHeight  + borderWidth) * 2),
         boardColor: cb.BoardColor.darkBrown,
         blackPieceColor: Colors.white,
-        onMove: (from,to,prom) => widget.client.areaCmd(GameMsg.newMove,data: {BingoFields.move : "$from$to${prom ?? ''}"}),
+        onMove: (from,to,prom) {
+          if (widget.client.currentGame.chessGame.getTurn() != widget.client.currentGame.chessGame.getUserColor(widget.client.userName)) {
+            widget.client.currentGame.chessGame.controller.undoMove();
+          }
+          widget.client.areaCmd(GameMsg.newMove,data: {BingoFields.move : "$from$to${prom ?? ''}"});
+        },
         onSquareSelect: (sqr,selected) {
           if (selected) { setState(() { selectedSquare = sqr; }); }
         },
@@ -179,7 +184,7 @@ class _GamePageState extends State<GamePage> {
         widget.client,widget.client.currentGame,userBoard,selectedSquare,boardSize
     ) : const SizedBox.shrink();
     Widget tv = widget.client.currentGame != widget.client.noArea
-        ? getTvBoard(boardSize)
+        ? getChessBoard(boardSize)
         : const SizedBox.shrink();
     return Flex(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -223,8 +228,8 @@ class _GamePageState extends State<GamePage> {
         widget.client,widget.client.currentGame,userBoard,selectedSquare,boardSize
     ) : const SizedBox.shrink();
 
-    Widget tv = widget.client.currentGame != widget.client.noArea
-        ? getTvBoard(tvSize)
+    Widget tv = widget.client.currentGame != widget.client.noArea //TODO: handle this better
+        ? getChessBoard(tvSize)
         : const SizedBox.shrink();
 
     Widget userBoardArea =  widget.client.helpMode ? getHelpWrapper(bbw, HelpArea.mainBoard) : bbw;
@@ -246,7 +251,7 @@ class _GamePageState extends State<GamePage> {
 
     Image bkgImg =  Image(image: ZugUtils.getAssetImage("images/bingo_bkg_land.png"), fit: BoxFit.fill);
 
-    return (userBoard == null)
+    return (widget.client.currentArea == widget.client.noArea)
         ? Row(children: [Expanded(child: bkgImg), lobbyArea])
         : Row(children: [
           Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [

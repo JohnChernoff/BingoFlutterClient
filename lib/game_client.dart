@@ -11,7 +11,6 @@ import 'bingo_game.dart';
 
 class GameClient extends ZugClient {
 
-
   bool helpMode = false;
   BingoGame get currentGame => currentArea as BingoGame;
   AssetSource coolClip = AssetSource("audio/clips/cool.mp3");
@@ -19,6 +18,7 @@ class GameClient extends ZugClient {
   AssetSource victoryClip = AssetSource("audio/clips/victory.mp3");
   AssetSource dingClip = AssetSource("audio/clips/ding.mp3");
   AssetSource doinkClip = AssetSource("audio/clips/doink.mp3");
+  AssetSource moveClip = AssetSource("audio/clips/move.mp3");
 
   GameClient(super.domain, super.port, super.remoteEndpoint, super.prefs, {super.localServer}) { //showServMess = true;
     clientName = "BingoClient";
@@ -140,7 +140,9 @@ class GameClient extends ZugClient {
 
   void handleNewMove(data) {
     if (currentArea == getOrCreateArea(data)) {
-      addAreaMsg("New move: ${data[BingoFields.pan]}", currentArea.id);
+      UniqueName pName = UniqueName.fromData(data[fieldOccupant]);
+      addAreaMsg("New move: ${data[BingoFields.pan]} ($pName)", currentArea.id);
+      if (!pName.eq(userName)) playAudio(moveClip,clip: true, pauseCurrentTrack: false);
     }
   }
 
