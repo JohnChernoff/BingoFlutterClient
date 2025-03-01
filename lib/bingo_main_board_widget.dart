@@ -1,6 +1,5 @@
 import 'package:bingo_client/game_client.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_chess_board/flutter_chess_board.dart' hide Color;
 import 'package:zug_utils/zug_utils.dart';
 import 'package:zugclient/options_page.dart';
 import 'package:zugclient/zug_fields.dart';
@@ -8,16 +7,15 @@ import 'bingo_fields.dart';
 import 'dialogs.dart';
 import 'bingo_game.dart';
 
-class BingoBoardWidget2 extends StatelessWidget {
+class BingoMainBoardWidget extends StatelessWidget {
   final GameClient client;
   final double size;
   final BingoBoard board;
   final BingoGame game;
-  final SquareCoord? selectedSquare;
   final int bingColHex;
   final double imgWidth = 901;
   final double imgHeight = 890;
-  const BingoBoardWidget2(this.client,this.game,this.board,this.selectedSquare,this.size,{super.key,this.bingColHex = 0xFFE0C4A2});
+  const BingoMainBoardWidget(this.client,this.game,this.board,this.size,{super.key,this.bingColHex = 0xFFE0C4A2});
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +112,7 @@ class BingoBoardWidget2 extends StatelessWidget {
               decoration: BoxDecoration(
                   color:  sqr.checked > 0 ? bingCol : null, //Color.fromRGBO(255, 255, 0, .75), //
                   shape: BoxShape.circle,
-                  border: selectedSquare?.name == sqr.chessSqr.toLowerCase() ? Border.all(color: Colors.white,width: 4) : null,
+                  border: client.selectedSquare?.name == sqr.chessSqr.toLowerCase() ? Border.all(color: Colors.white,width: 4) : null,
               ),
               child: Center(child: SizedBox(
                   width: txtBoxWidth,

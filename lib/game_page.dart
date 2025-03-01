@@ -1,20 +1,21 @@
 import 'dart:math';
-import 'package:bingo_client/help_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_chess_board/flutter_chess_board.dart' as cb;
 import 'package:zug_utils/zug_utils.dart';
 import 'package:zugclient/lobby_page.dart';
 import 'package:zugclient/zug_chat.dart';
 import 'package:zugclient/zug_client.dart';
 import 'package:zugclient/zug_fields.dart';
-import 'bingo_board_widget.dart';
-import 'bingo_board_widget2.dart';
 import 'bingo_fields.dart';
 import 'bingo_lobby.dart';
+import 'bingo_main_board_widget.dart';
+import 'bingo_opp_board_widget.dart';
 import 'chess_game.dart';
 import 'bingo_game.dart';
+import 'chess_widget.dart';
 import 'game_client.dart';
+import 'help_widget.dart';
+import 'text_box.dart';
 
 class GamePage extends StatefulWidget {
   static TextStyle txtStyle = const TextStyle(color: Colors.white);
@@ -29,7 +30,6 @@ class GamePage extends StatefulWidget {
 class _GamePageState extends State<GamePage> {
   Offset? mouseOff;
   HelpArea helpArea = HelpArea.none;
-  cb.SquareCoord? selectedSquare;
 
   @override
   void initState() {
@@ -113,78 +113,27 @@ class _GamePageState extends State<GamePage> {
     }
   }
 
-  Widget getTextBox(String txt, Color color, {double? width, double? height, txtCol = Colors.black, borderCol = Colors.white, double borderWidth = 1, margin = 0.0}) {
-    return Container(
-      margin: EdgeInsets.all(margin),
-      decoration: BoxDecoration(
-        color: color,
-        border: (borderWidth > 0) ? Border.all(color: borderCol, width: borderWidth) : null
-      ),
-      width: width, height: height,
-      child: Center(child: Text(txt,style: TextStyle(color: txtCol))),
-    );
-  }
-
-  Widget getChessBoard(double boardSize, {double infoHeight = 24, double borderWidth = 0}) {
-    cb.PlayerColor bottomColor = widget.client.currentGame.chessGame.getOrientation(widget.client.userName);
-    cb.PlayerColor topColor = bottomColor == cb.PlayerColor.white ? cb.PlayerColor.black : cb.PlayerColor.white;
-
-    return Container(
-        decoration: BoxDecoration(
-          border: (borderWidth > 0) ? Border.all(color: Colors.white,width: borderWidth) : null,
-        ),
-        width: boardSize,
-        height: boardSize,
-        child: Center( child: Column(children: [
-      getTextBox("${widget.client.currentGame.chessGame.getTurn() == topColor ? "***" : ""} ${widget.client.currentGame.chessGame.getPlayerString(topColor)}",
-          borderWidth: 0, //widget.client.currentGame.lastTurn == Turn.black ? 1 : 0,
-          height: infoHeight,
-          Colors.black,
-          txtCol: Colors.white), //widget.client.currentGame.lastTurn == Turn.black ? Colors.green : Colors.white),
-      cb.ChessBoard(
-        controller: widget.client.currentGame.chessGame.controller,
-        boardOrientation: bottomColor,
-        size: boardSize - ((infoHeight  + borderWidth) * 2),
-        boardColor: cb.BoardColor.darkBrown,
-        blackPieceColor: Colors.white,
-        onMove: (from,to,prom) {
-          if (widget.client.currentGame.chessGame.getTurn() != widget.client.currentGame.chessGame.getUserColor(widget.client.userName)) {
-            widget.client.currentGame.chessGame.controller.undoMove();
-          }
-          widget.client.areaCmd(GameMsg.newMove,data: {BingoFields.move : "$from$to${prom ?? ''}"});
-        },
-        onSquareSelect: (sqr,selected) {
-          if (selected) { setState(() { selectedSquare = sqr; }); }
-        },
-      ),
-      getTextBox("${widget.client.currentGame.chessGame.getTurn() == bottomColor ? "***" : ""} ${widget.client.currentGame.chessGame.getPlayerString(bottomColor)}",
-          borderWidth: 0, //widget.client.currentGame.lastTurn == Turn.white ? 1 : 0,
-          height: infoHeight,
-          Colors.black,
-          txtCol: Colors.white), //widget.client.currentGame.lastTurn == Turn.white ? Colors.green : Colors.white),
-    ])));
-  }
 
   Widget getInfoWidget(double height) {
     if (widget.client.currentGame.phase != GamePhase.unknown) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          getTextBox(height: height,"Ante: ${widget.client.currentGame.ante} ",Colors.redAccent),
-          getTextBox(height: height,"Pot: ${widget.client.currentGame.pot} ",Colors.greenAccent),
-          getTextBox(height: height,"Insta-Pot: ${widget.client.currentGame.instapot} ",Colors.blueAccent),
+          TextBox(height: height,"Ante: ${widget.client.currentGame.ante} ",Colors.redAccent),
+          TextBox(height: height,"Pot: ${widget.client.currentGame.pot} ",Colors.greenAccent),
+          TextBox(height: height,"Insta-Pot: ${widget.client.currentGame.instapot} ",Colors.blueAccent),
         ]
       );
     }
     return const SizedBox.shrink();
   }
 
-  Widget getMainBoardsWidget(BingoBoard? userBoard,double boardSize,Color borderColor, Axis axis) {
-    Widget bbw = userBoard != null ? BingoBoardWidget2(
-        widget.client,widget.client.currentGame,userBoard,selectedSquare,boardSize
+  Widget getMainArea(BingoBoard? userBoard,double boardSize,Color borderColor, Axis axis) {
+    Widget bbw = userBoard != null ? BingoMainBoardWidget(
+        widget.client,widget.client.currentGame,userBoard,boardSize
     ) : const SizedBox.shrink();
     Widget tv = widget.client.currentGame != widget.client.noArea
-        ? getChessBoard(boardSize)
+        ? ChessBoardWidget(widget.client,boardSize)
         : const SizedBox.shrink();
     return Flex(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -196,7 +145,7 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
-  Widget getOtherBoardsWidget(List<BingoBoard> otherBoards, double size, Color borderColor, Axis axis) {
+  Widget getOtherBingoBoards(List<BingoBoard> otherBoards, double size, Color borderColor, Axis axis) {
     return SizedBox(
         width: axis == Axis.vertical ? size : null,
         height: axis == Axis.horizontal ? size : null,
@@ -206,9 +155,10 @@ class _GamePageState extends State<GamePage> {
               direction: axis,
               children: List.generate(
                 otherBoards.length,
-                    (index) => BingoBoardWidget(
+                    (index) => BingoOpponentBoardWidget(
                   otherBoards.elementAt(index), size * .8,
                   borderColor: borderColor,
+                  selectedSquare: widget.client.selectedSquare,
                   onTap: (x,y) => handleTap(x, y, otherBoards.elementAt(index).playerName),
                 ),
               ),
@@ -224,12 +174,12 @@ class _GamePageState extends State<GamePage> {
     double upperHeight = tvSize;
     double bottomHeight = constraints.maxHeight - upperHeight;
 
-    Widget bbw = userBoard != null ? BingoBoardWidget2(
-        widget.client,widget.client.currentGame,userBoard,selectedSquare,boardSize
+    Widget bbw = userBoard != null ? BingoMainBoardWidget(
+        widget.client,widget.client.currentGame,userBoard,boardSize
     ) : const SizedBox.shrink();
 
     Widget tv = widget.client.currentGame != widget.client.noArea //TODO: handle this better
-        ? getChessBoard(tvSize)
+        ? ChessBoardWidget(widget.client,tvSize)
         : const SizedBox.shrink();
 
     Widget userBoardArea =  widget.client.helpMode ? getHelpWrapper(bbw, HelpArea.mainBoard) : bbw;
@@ -245,9 +195,9 @@ class _GamePageState extends State<GamePage> {
         chatArea: ZugChat(widget.client, width: 320, defScope: MessageScope.server));
 
     Widget otherBoardsArea = widget.client.helpMode
-        ? getHelpWrapper(getOtherBoardsWidget(otherBoards, bottomHeight, borderColor, Axis.horizontal),
+        ? getHelpWrapper(getOtherBingoBoards(otherBoards, bottomHeight, borderColor, Axis.horizontal),
         HelpArea.otherBoard)
-        : getOtherBoardsWidget(otherBoards, bottomHeight, borderColor, Axis.horizontal);
+        : getOtherBingoBoards(otherBoards, bottomHeight, borderColor, Axis.horizontal);
 
     Image bkgImg =  Image(image: ZugUtils.getAssetImage("images/bingo_bkg_land.png"), fit: BoxFit.fill);
 
@@ -276,9 +226,9 @@ class _GamePageState extends State<GamePage> {
         const SizedBox(height: 16),
         getInfoWidget(128),
         const SizedBox(height: 16),
-        getMainBoardsWidget(userBoard, boardSize, borderColor, Axis.vertical),
+        getMainArea(userBoard, boardSize, borderColor, Axis.vertical),
         const SizedBox(height: 16),
-        getOtherBoardsWidget(otherBoards, constraints.maxWidth, borderColor, Axis.vertical),
+        getOtherBingoBoards(otherBoards, constraints.maxWidth, borderColor, Axis.vertical),
         const SizedBox(height: 16),
         SizedBox(
           height: constraints.maxHeight,

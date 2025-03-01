@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter_chess_board/flutter_chess_board.dart';
 import 'package:zug_utils/zug_dialogs.dart';
 import 'package:zugclient/dialogs.dart';
 import 'package:zugclient/zug_app.dart';
@@ -13,6 +14,12 @@ class GameClient extends ZugClient {
 
   bool helpMode = false;
   BingoGame get currentGame => currentArea as BingoGame;
+  SquareCoord? _selectedSquare;
+  SquareCoord? get selectedSquare => _selectedSquare;
+  set selectedSquare(SquareCoord? coord) {
+    _selectedSquare = coord;
+    notifyListeners();
+  }
   AssetSource coolClip = AssetSource("audio/clips/cool.mp3");
   AssetSource defeatClip = AssetSource("audio/clips/defeat.mp3");
   AssetSource victoryClip = AssetSource("audio/clips/victory.mp3");
