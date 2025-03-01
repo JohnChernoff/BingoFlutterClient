@@ -192,7 +192,8 @@ class _GamePageState extends State<GamePage> {
         style: LobbyStyle.tersePort,
         width: 320,
         buttonsBkgCol: Colors.black,
-        chatArea: ZugChat(widget.client, width: 320, defScope: MessageScope.server));
+        zugChat: ZugChat(widget.client, width: 320,
+          defScope: widget.client.currentArea == widget.client.noArea ? MessageScope.server : MessageScope.area));
 
     Widget otherBoardsArea = widget.client.helpMode
         ? getHelpWrapper(getOtherBingoBoards(otherBoards, bottomHeight, borderColor, Axis.horizontal),
@@ -236,7 +237,7 @@ class _GamePageState extends State<GamePage> {
               style: LobbyStyle.tersePort,
               width: constraints.maxWidth,
               buttonsBkgCol: Colors.black,
-              chatArea: ZugChat(widget.client, width: constraints.maxWidth, defScope: MessageScope.server)),
+              zugChat: ZugChat(widget.client, width: constraints.maxWidth, defScope: MessageScope.server)),
         )
       ],
     ));

@@ -18,7 +18,8 @@ class BingoLobby extends LobbyPage {
     super.width,
     super.borderWidth  = 1,
     super.borderCol = Colors.white,
-    super.key, super.chatArea});
+    super.zugChat,
+    super.key});
 
   @override
   List<DataColumn> getOccupantHeaders({Color color = Colors.white}) {
