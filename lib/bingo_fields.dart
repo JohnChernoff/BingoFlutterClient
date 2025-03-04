@@ -37,4 +37,6 @@ class BingoFields {
   static String game = "game";
   static String fen = "fen";
   static String playingGame = "playingGame";
+  static String confStart = "confirmStart";
+  static String confRematch = "confirmRematch";
 }
