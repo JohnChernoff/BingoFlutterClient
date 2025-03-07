@@ -10,6 +10,7 @@ import 'package:zugclient/zug_client.dart';
 import 'package:zugclient/zug_fields.dart';
 import 'bingo_game.dart';
 
+
 class GameClient extends ZugClient {
 
   bool helpMode = false;
@@ -86,12 +87,15 @@ class GameClient extends ZugClient {
   }
 
   @override
-  void handleResponse(data) {
+  void handleResponseRequest(data) {
+    super.handleResponseRequest(data);
     if (data[fieldResponseType] == BingoFields.confStart) {
-      ZugDialogs.confirm("Start Game?").then((confirm) => areaCmd(ClientMsg.response, data: {fieldResponse : confirm, fieldResponseType : BingoFields.confStart}));
+      ZugDialogs.confirm("Start Game?",canceller: dialogTracker[BingoFields.confStart])
+          .then((confirm) => areaCmd(ClientMsg.response, data: {fieldResponse : confirm, fieldResponseType : BingoFields.confStart}));
     }
-    if (data[fieldResponseType] == BingoFields.confRematch) {
-      ZugDialogs.confirm("Rematch?").then((confirm) => areaCmd(ClientMsg.response, data: {fieldResponse : confirm, fieldResponseType : BingoFields.confRematch}));
+    else if (data[fieldResponseType] == BingoFields.confRematch) {
+      ZugDialogs.confirm("Rematch?",canceller: dialogTracker[BingoFields.confRematch])
+          .then((confirm) => areaCmd(ClientMsg.response, data: {fieldResponse : confirm, fieldResponseType : BingoFields.confRematch}));
     }
   }
 
