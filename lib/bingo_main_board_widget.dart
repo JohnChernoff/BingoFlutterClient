@@ -1,14 +1,14 @@
-import 'package:bingo_client/game_client.dart';
 import 'package:flutter/material.dart';
 import 'package:zug_utils/zug_utils.dart';
 import 'package:zugclient/options_page.dart';
 import 'package:zugclient/zug_fields.dart';
+import 'bingo_client.dart';
 import 'bingo_fields.dart';
 import 'dialogs.dart';
 import 'bingo_game.dart';
 
 class BingoMainBoardWidget extends StatelessWidget {
-  final GameClient client;
+  final BingoClient client;
   final double size;
   final BingoBoard board;
   final BingoGame game;

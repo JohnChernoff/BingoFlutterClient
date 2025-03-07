@@ -6,7 +6,7 @@ import 'package:zugclient/zug_client.dart';
 
 import 'bingo_fields.dart';
 import 'dialogs.dart';
-import 'game_client.dart';
+import 'bingo_client.dart';
 
 class BingoLobby extends LobbyPage {
   const BingoLobby(super.client, {
@@ -44,12 +44,12 @@ class BingoLobby extends LobbyPage {
     return [
       ElevatedButton(
           style: getButtonStyle(Colors.white, Colors.greenAccent),
-          onPressed: () async => HelpDialog(client as GameClient,await rootBundle.loadString('txt/help.txt')).raise(),
+          onPressed: () async => HelpDialog(client as BingoClient,await rootBundle.loadString('txt/help.txt')).raise(),
           child: Text("Help", style: getButtonTextStyle())
       ),
       ElevatedButton(
           style: getButtonStyle(Colors.blue, Colors.greenAccent),
-          onPressed: () => OptionDialog(client as GameClient,context,OptionScope.general).raise(),
+          onPressed: () => OptionDialog(client as BingoClient,context,OptionScope.general).raise(),
           child: Text("Settings", style: getButtonTextStyle())
       ),
       ElevatedButton(

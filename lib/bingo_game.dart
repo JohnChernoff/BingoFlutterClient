@@ -3,7 +3,7 @@ import 'package:zugclient/zug_client.dart';
 import 'package:zugclient/zug_fields.dart';
 import 'bingo_fields.dart';
 import 'chess_game.dart';
-import 'game_client.dart';
+import 'bingo_client.dart';
 
 class BingoBoard {
   final int dim;
@@ -66,7 +66,7 @@ class BingoGame extends Area {
   }
 
   //TODO: create squareChanged() to reduce spam
-  void update(dynamic data,{ GameClient? client } ) { //print("game data: $data");
+  void update(dynamic data,{ BingoClient? client } ) { //print("game data: $data");
     boards.clear();
     List<dynamic> boardList = data[BingoFields.boards];
     for (dynamic boardData in boardList) {

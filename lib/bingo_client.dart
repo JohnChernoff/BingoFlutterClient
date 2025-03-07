@@ -10,8 +10,7 @@ import 'package:zugclient/zug_client.dart';
 import 'package:zugclient/zug_fields.dart';
 import 'bingo_game.dart';
 
-
-class GameClient extends ZugClient {
+class BingoClient extends ZugClient {
 
   bool helpMode = false;
   BingoGame get currentGame => currentArea as BingoGame;
@@ -28,7 +27,7 @@ class GameClient extends ZugClient {
   AssetSource doinkClip = AssetSource("audio/clips/doink.mp3");
   AssetSource moveClip = AssetSource("audio/clips/move.mp3");
 
-  GameClient(super.domain, super.port, super.remoteEndpoint, super.prefs, {super.localServer}) { //showServMess = true;
+  BingoClient(super.domain, super.port, super.remoteEndpoint, super.prefs, {super.localServer}) { //showServMess = true;
     clientName = "BingoClient";
     addFunctions({
       ServMsg.updateServ : handleUpdateServ,

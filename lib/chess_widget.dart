@@ -1,13 +1,13 @@
-import 'package:bingo_client/game_client.dart';
 import 'package:bingo_client/text_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart' as cb;
+import 'bingo_client.dart';
 import 'bingo_fields.dart';
 import 'chess_game.dart';
 
 class ChessBoardWidget extends StatefulWidget {
   final double boardSize, infoHeight, borderWidth;
-  final GameClient client;
+  final BingoClient client;
   final ChessGame chessGame;
 
   ChessBoardWidget(this.client,this.boardSize, {super.key, this.infoHeight = 24, this.borderWidth = 0}) : chessGame = client.currentGame.chessGame;

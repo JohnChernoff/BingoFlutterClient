@@ -5,8 +5,8 @@ import 'package:logging/logging.dart';
 import 'package:zug_utils/zug_utils.dart';
 import 'package:zugclient/zug_app.dart';
 import 'package:zugclient/zug_client.dart';
+import 'bingo_client.dart';
 import 'bingo_lobby.dart';
-import 'game_client.dart';
 import 'game_page.dart';
 
 /*
@@ -41,7 +41,7 @@ void main() {
       String endPoint = defaults["endpoint"] ?? "bingosrv";
       bool localServer = bool.parse(defaults["localServer"] ?? "true");
       log("Starting $appName Client, domain: $domain, port: $port, endpoint: $endPoint, localServer: $localServer");
-      GameClient client = GameClient(domain,port,endPoint,prefs,localServer : localServer);
+      BingoClient client = BingoClient(domain,port,endPoint,prefs,localServer : localServer);
       runApp(GameApp(client,appName));
     });
   });
@@ -63,7 +63,7 @@ class GameApp extends ZugApp {
   }
 
   @override
-  Widget createMainPage(ZugClient client) => GamePage(client as GameClient);
+  Widget createMainPage(ZugClient client) => GamePage(client as BingoClient);
 
   @override
   Widget createLobbyPage(ZugClient client) => BingoLobby(client);

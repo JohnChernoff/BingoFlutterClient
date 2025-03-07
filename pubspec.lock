@@ -209,9 +209,11 @@ packages:
   flutter_chess_board:
     dependency: "direct main"
     description:
-      path: "C:\\Users\\jac107\\IdeaProjects\\flutter\\flutter_chess_board"
-      relative: false
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "499e1d8cc190406f146f9b8b2c6d804f846533b7"
+      url: "https://github.com/JohnChernoff/flutter_chess_board"
+    source: git
     version: "1.0.1"
   flutter_lints:
     dependency: "direct dev"
@@ -815,18 +817,22 @@ packages:
     source: git
     version: "0.0.1"
   zug_utils:
-    dependency: transitive
+    dependency: "direct main"
     description:
-      path: "C:/Users/jac107/IdeaProjects/flutter/zug_utils"
-      relative: false
-    source: path
-    version: "0.0.6"
+      path: "."
+      ref: HEAD
+      resolved-ref: "36ecbe25054c02efe08ec353fce110e24f219c03"
+      url: "https://github.com/JohnChernoff/zug_utils"
+    source: git
+    version: "0.0.7"
   zugclient:
     dependency: "direct main"
     description:
-      path: "C:\\Users\\jac107\\IdeaProjects\\flutter\\zugclient"
-      relative: false
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "4e3d6f12969b0cfa45daed484c22b863bdebe4ab"
+      url: "https://github.com/JohnChernoff/zugclient"
+    source: git
     version: "0.3.8"
 sdks:
   dart: ">=3.5.2 <4.0.0"

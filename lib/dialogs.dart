@@ -1,8 +1,8 @@
-import 'dart:math';
-import 'package:bingo_client/game_client.dart';
 import 'package:flutter/material.dart';
 import 'package:zugclient/options_page.dart';
 import 'package:zugclient/zug_app.dart';
+
+import 'bingo_client.dart';
 
 class TopDialog {
   BuildContext ctx;
@@ -31,7 +31,7 @@ class TopDialog {
 }
 
 class OptionDialog {
-  GameClient client;
+  BingoClient client;
   BuildContext ctx;
   OptionScope scope;
   OptionDialog(this.client, this.ctx, this.scope);
@@ -55,7 +55,7 @@ class OptionDialog {
 }
 
 class HelpDialog {
-  GameClient client;
+  BingoClient client;
   String helpTxt;
 
   HelpDialog(this.client, this.helpTxt);
@@ -80,7 +80,7 @@ class HelpDialog {
 }
 
 class HelpModeDialogOption extends StatefulWidget {
-  final GameClient client;
+  final BingoClient client;
   const HelpModeDialogOption(this.client,{super.key});
   @override
   State<StatefulWidget> createState() => HelpModeDialogOptionState();

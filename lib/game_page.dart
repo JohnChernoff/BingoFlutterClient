@@ -1,4 +1,4 @@
-import 'dart:math';
+//import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:zug_utils/zug_utils.dart';
@@ -6,6 +6,7 @@ import 'package:zugclient/lobby_page.dart';
 import 'package:zugclient/zug_chat.dart';
 import 'package:zugclient/zug_client.dart';
 import 'package:zugclient/zug_fields.dart';
+import 'bingo_client.dart';
 import 'bingo_fields.dart';
 import 'bingo_lobby.dart';
 import 'bingo_main_board_widget.dart';
@@ -13,13 +14,12 @@ import 'bingo_opp_board_widget.dart';
 import 'chess_game.dart';
 import 'bingo_game.dart';
 import 'chess_widget.dart';
-import 'game_client.dart';
 import 'help_widget.dart';
 import 'text_box.dart';
 
 class GamePage extends StatefulWidget {
   static TextStyle txtStyle = const TextStyle(color: Colors.white);
-  final GameClient client;
+  final BingoClient client;
 
   const GamePage(this.client, {super.key});
 
@@ -113,20 +113,24 @@ class _GamePageState extends State<GamePage> {
     }
   }
 
-
-  Widget getInfoWidget(double height) {
+  Widget getInfoWidget(double width) {
     if (widget.client.currentGame.phase != GamePhase.unknown) {
-      return Row(
+      return SizedBox(width: width, child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          TextBox(height: height,"Ante: ${widget.client.currentGame.ante} ",Colors.redAccent),
-          TextBox(height: height,"Pot: ${widget.client.currentGame.pot} ",Colors.greenAccent),
-          TextBox(height: height,"Insta-Pot: ${widget.client.currentGame.instapot} ",Colors.blueAccent),
+          Expanded(child: TextBox("Ante: ${widget.client.currentGame.ante} ",Colors.redAccent)),
+          Expanded(child: TextBox("Pot: ${widget.client.currentGame.pot} ",Colors.greenAccent)),
+          Expanded(child: TextBox("Insta-Pot: ${widget.client.currentGame.instapot} ",Colors.blueAccent)),
+          Expanded(child: InkWell(onTap:  () => widget.client.areaCmd(GameMsg.resign), child: const TextBox("Resign",Colors.red))),
+          Expanded(child: InkWell(onTap:  () => widget.client.areaCmd(GameMsg.draw), child: const TextBox("Draw",Colors.white))),
         ]
-      );
+      ));
     }
     return const SizedBox.shrink();
   }
+
+
+
 
   Widget getMainArea(BingoBoard? userBoard,double boardSize,Color borderColor, Axis axis) {
     Widget bbw = userBoard != null ? BingoMainBoardWidget(
@@ -167,11 +171,10 @@ class _GamePageState extends State<GamePage> {
 
   Widget getLandscapeLayout(BingoBoard? userBoard,List<BingoBoard> otherBoards,BoxConstraints constraints) {
     bool isRunning = widget.client.currentGame.phase == GamePhase.running;
-    Color borderColor = isRunning ? Colors.white : Colors.brown;
-    double headerHeight = min(48,constraints.maxHeight * .1);
+    Color borderColor = isRunning ? Colors.white : Colors.brown; //double headerHeight = min(48,constraints.maxHeight * .2);
     double boardSize = constraints.maxHeight * .8;
-    double tvSize = constraints.maxHeight/2;
-    double upperHeight = tvSize;
+    double chessboardSize = constraints.maxHeight/2;
+    double upperHeight = chessboardSize;
     double bottomHeight = constraints.maxHeight - upperHeight;
 
     Widget bbw = userBoard != null ? BingoMainBoardWidget(
@@ -179,14 +182,14 @@ class _GamePageState extends State<GamePage> {
     ) : const SizedBox.shrink();
 
     Widget tv = widget.client.currentGame != widget.client.noArea //TODO: handle this better
-        ? ChessBoardWidget(widget.client,tvSize)
+        ? ChessBoardWidget(widget.client,chessboardSize)
         : const SizedBox.shrink();
 
     Widget userBoardArea =  widget.client.helpMode ? getHelpWrapper(bbw, HelpArea.mainBoard) : bbw;
 
     Widget tvArea = widget.client.helpMode ? getHelpWrapper(tv, HelpArea.tv) : tv;
 
-    Widget infoArea = widget.client.helpMode ? getHelpWrapper(getInfoWidget(headerHeight), HelpArea.info) : getInfoWidget(headerHeight);
+    Widget infoArea = widget.client.helpMode ? getHelpWrapper(getInfoWidget(chessboardSize), HelpArea.info) : getInfoWidget(chessboardSize);
 
     Widget lobbyArea = BingoLobby(widget.client,
         style: LobbyStyle.tersePort,
@@ -206,7 +209,11 @@ class _GamePageState extends State<GamePage> {
         ? Row(children: [Expanded(child: bkgImg), lobbyArea])
         : Row(children: [
           Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-            infoArea,
+           Expanded(child: Column(children: [
+              const Expanded(child: SizedBox()), //ColoredBox(color: Colors.green, child: SizedBox(width: chessboardSize))),
+              Expanded(flex: 2, child: userBoard != null ? infoArea : const SizedBox()),
+              const Expanded(child: SizedBox()), //ColoredBox(color: Colors.green, child: SizedBox(width: chessboardSize))),
+            ])),
             userBoardArea
           ]),
           Expanded(child: Column(children: [
@@ -225,7 +232,7 @@ class _GamePageState extends State<GamePage> {
     return SingleChildScrollView(child: Column(
       children: [
         const SizedBox(height: 16),
-        getInfoWidget(128),
+        getInfoWidget(boardSize),
         const SizedBox(height: 16),
         getMainArea(userBoard, boardSize, borderColor, Axis.vertical),
         const SizedBox(height: 16),
