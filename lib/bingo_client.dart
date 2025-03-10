@@ -30,7 +30,6 @@ class BingoClient extends ZugClient {
   BingoClient(super.domain, super.port, super.remoteEndpoint, super.prefs, {super.localServer}) { //showServMess = true;
     clientName = "BingoClient";
     addFunctions({
-      ServMsg.updateServ : handleUpdateServ,
       GameMsg.top : handleTop,
       GameMsg.phase : handlePhase,
       GameMsg.newFeatured : handleFeatured,
@@ -63,10 +62,6 @@ class BingoClient extends ZugClient {
     return logOK;
   }
 
-  void handleUpdateServ(data) {
-    ZugClient.log.info("Serv: $data");
-  }
-
   void setHelpMode(bool b) {
     helpMode = b;
     notifyListeners();
@@ -95,6 +90,10 @@ class BingoClient extends ZugClient {
     else if (data[fieldResponseType] == BingoFields.confRematch) {
       ZugDialogs.confirm("Rematch?",canceller: dialogTracker[BingoFields.confRematch])
           .then((confirm) => areaCmd(ClientMsg.response, data: {fieldResponse : confirm, fieldResponseType : BingoFields.confRematch}));
+    }
+    else if (data[fieldResponseType] == BingoFields.confDraw) {
+      ZugDialogs.confirm("Draw?",canceller: dialogTracker[BingoFields.confDraw])
+          .then((confirm) => areaCmd(ClientMsg.response, data: {fieldResponse : confirm, fieldResponseType : BingoFields.confDraw}));
     }
   }
 
